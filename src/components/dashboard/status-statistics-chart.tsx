@@ -2,26 +2,24 @@
 
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts"
 import { ChartContainer, ChartTooltipContent } from "@/src/components/ui/chart"
-import type { Animal } from "@/src/app/[labId]/dashboard/types"
+import type { Request } from "@/src/app/[labId]/dashboard/types"
 import { useMemo } from "react"
 
 const statusMapping = {
-  ACTIVE: { label: "Active", color: "#10B981" },
-  EXPERIMENT: { label: "Experiment", color: "#8B5CF6" },
-  BREEDING: { label: "Breeding", color: "#3B82F6" },
-  QUARANTINE: { label: "Quarantine", color: "#F59E0B" },
-  TRANSFERRED: { label: "Transferred", color: "#6B7280" },
-  RETIRED: { label: "Retired", color: "#84CC16" },
-  DECEASED: { label: "Deceased", color: "#EF4444" },
+  WAITING: { label: "Waiting", color: "#10B981" },
+  ORDERED: { label: "Ordered", color: "#FF69B4" },
+  RECEIVED: { label: "Received", color: "#F59E0B" },
+  ON_HOLD: { label: "On Hold", color: "#6B7280" },
+  CANCELLED: { label: "Cancelled", color: "#EF4444" },
 } as const
 
-function processStatusData(animals: Animal[]) {
-  if (!animals || animals.length === 0) {
+function processStatusData(requests: Request[]) {
+  if (!requests || requests.length === 0) {
     return []
   }
 
-  const statusCounts = animals.reduce((acc, animal) => {
-    const status = animal.status
+  const statusCounts = requests.reduce((acc, request) => {
+    const status = request.status
     if (!acc[status]) {
       acc[status] = 0
     }
@@ -41,8 +39,8 @@ function processStatusData(animals: Animal[]) {
   return chartData
 }
 
-export function StatusStatisticsChart({animals}: {animals: Animal[]}) {
-  const chartData = useMemo(() => processStatusData(animals), [animals])
+export function StatusStatisticsChart({requests}: {requests: Request[]}) {
+  const chartData = useMemo(() => processStatusData(requests), [requests])
 
   const config = useMemo(() => {
     if (!chartData || chartData.length === 0) return {}

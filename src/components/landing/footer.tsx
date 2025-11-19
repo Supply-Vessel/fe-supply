@@ -1,4 +1,4 @@
-import { Microscope, Mail, Phone, MapPin } from "lucide-react"
+import { Ship, Mail, Phone, MapPin } from 'lucide-react'
 
 export function Footer() {
     const footerLinks = {
@@ -36,18 +36,17 @@ export function Footer() {
                     <div className="lg:col-span-2">
                         <div className="flex items-center space-x-3 mb-6">
                             <div className="p-2 bg-[#2563EB] rounded-lg">
-                                <Microscope className="h-6 w-6 text-white" />
+                                <Ship className="h-6 w-6 text-white" />
                             </div>
-                            <span className="text-2xl font-bold">LabAssist</span>
+                            <span className="text-2xl font-bold">ShipHub</span>
                         </div>
                         <p className="text-gray-400 mb-6 leading-relaxed">
-                            The leading platform for laboratory animal management, helping research institutions worldwide improve
-                            animal care and research outcomes.
+                            The leading platform for maritime supply management and fleet operations, helping shipping companies worldwide optimize their logistics and improve operational efficiency.
                         </p>
                         <div className="space-y-3">
                             <div className="flex items-center space-x-3">
                                 <Mail className="h-4 w-4 text-gray-400" />
-                                <span className="text-gray-400">contact@labassist.com</span>
+                                <span className="text-gray-400">contact@shiphub.com</span>
                             </div>
                             <div className="flex items-center space-x-3">
                                 <Phone className="h-4 w-4 text-gray-400" />
@@ -55,7 +54,7 @@ export function Footer() {
                             </div>
                             <div className="flex items-center space-x-3">
                                 <MapPin className="h-4 w-4 text-gray-400" />
-                                <span className="text-gray-400">San Francisco, CA</span>
+                                <span className="text-gray-400">Rotterdam, Netherlands</span>
                             </div>
                         </div>
                     </div>
@@ -116,7 +115,7 @@ export function Footer() {
 
                 <div className="border-t border-gray-800 mt-12 pt-8">
                     <div className="flex flex-col md:flex-row justify-between items-center">
-                        <p className="text-gray-400 text-sm">© 2024 LabAssist. All rights reserved.</p>
+                        <p className="text-gray-400 text-sm">© 2025 ShipHub. All rights reserved.</p>
                         <div className="flex space-x-6 mt-4 md:mt-0">
                             <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">
                                 Privacy

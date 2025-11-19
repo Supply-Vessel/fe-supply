@@ -79,7 +79,7 @@ export default function TeamContainer(props: TeamContainerProps) {
     if (memberToDelete) {
       const userLabId = memberToDelete;
       try {
-        const response = await apiClient.delete(`/api/laboratory/${userId}/${labId}/${userLabId}`);
+        const response = await apiClient.delete(`/api/vessel/${userId}/${labId}/${userLabId}`);
         const resSuccess = response.success;
 
         toast(resSuccess ? "Success" : "Error", {

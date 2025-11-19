@@ -1,27 +1,27 @@
 "use client"
 
-import type { Animal, DashboardContainerProps, Experiment, Task } from "./types";
+import type { Request, DashboardContainerProps, Experiment, Task } from "./types";
 import DashboardView from "./deshboard.view";
 import { useMemo, useState } from "react";
 
-const DashboardContainer = ({animals, experiments, tasks}: DashboardContainerProps) => {
+const DashboardContainer = ({requests, experiments, tasks}: DashboardContainerProps) => {
     const [experimentsData, setExperimentsData] = useState<Experiment[] | []>(experiments);
-    const [animalsData, setAnimalsData] = useState<Animal[] | []>(animals);
+    const [requestsData, setRequestsData] = useState<Request[] | []>(requests);
     const [tasksData, setTasksData] = useState<Task[] | []>(tasks);
 
     const now = new Date();
 
     const previousMonthData = useMemo(() => {
             return {
-                animals: animalsData.filter(animal => {
-                if (!animal?.acquisitionDate) return false;
-                const acquisitionDate = new Date(animal.acquisitionDate);
-                if (isNaN(acquisitionDate.getTime())) return false;
+                requests: requestsData.filter(request => {
+                if (!request?.createdAt) return false;
+                const createdAt = new Date(request.createdAt);
+                if (isNaN(createdAt.getTime())) return false;
                 
                 const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
                 const prevMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
                 
-                return acquisitionDate >= prevMonth && acquisitionDate <= prevMonthEnd;
+                return createdAt >= prevMonth && createdAt <= prevMonthEnd;
             }).length,
             
             experiments: experimentsData.filter(experiment => {
@@ -33,7 +33,7 @@ const DashboardContainer = ({animals, experiments, tasks}: DashboardContainerPro
                 const prevWeekEnd = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
                 
                 return startDate >= prevWeekStart && startDate <= prevWeekEnd;
-            }).length,
+            })?.length || 0,
             
             tasks: tasksData.filter(task => {
                 if (!task?.dueDate) return false;
@@ -43,15 +43,15 @@ const DashboardContainer = ({animals, experiments, tasks}: DashboardContainerPro
                 const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
                 
                 return dueDate.toDateString() === yesterday.toDateString();
-            }).length
+            }).length || 0,
         }
-    }, [animalsData, experimentsData, tasksData, now]);
+    }, [requestsData, experimentsData, tasksData, now]);
 
     return (
         <DashboardView 
             previousMonthData={previousMonthData}
             experiments={experimentsData}
-            animals={animalsData}
+            requests={requestsData}
             tasks={tasksData}
         />
     )

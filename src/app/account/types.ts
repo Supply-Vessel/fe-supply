@@ -1,15 +1,15 @@
 import type { SetStateAction } from "react"
 
 export enum Role {
-    VETERINARIAN = "VETERINARIAN",
-    RESEARCHER = "RESEARCHER", 
-    TECHNICIAN = "TECHNICIAN",
+    HEAD_OF_DEPARTMENT = "HEAD_OF_DEPARTMENT",
+    SAFETY_SPECIALIST = "SAFETY_SPECIALIST",
+    VESSEL_MANAGER = "VESSEL_MANAGER",
+    TEAM_LEADER = "TEAM_LEADER",
+    SUPPLIER = "SUPPLIER",
     DIRECTOR = "DIRECTOR",
-    STUDENT = "STUDENT",
-    MEMBER = "MEMBER",
-    OWNER = "OWNER",
-    ADMIN = "ADMIN",
-    GUEST = "GUEST"
+    COUNTER = "COUNTER",
+    GUEST = "GUEST",
+    TSI = "TSI",
 }
 
 export enum AccessStatus {
@@ -27,14 +27,12 @@ export enum ExperimentStatus {
     PAUSED = "PAUSED",
 }
 
-export enum AnimalStatus {
-    TRANSFERRED = "TRANSFERRED",
-    QUARANTINE = "QUARANTINE",
-    EXPERIMENT = "EXPERIMENT",
-    BREEDING = "BREEDING",
-    DECEASED = "DECEASED",
-    RETIRED = "RETIRED",
-    ACTIVE = "ACTIVE",
+export enum RequestStatus {
+    WAITING = "WAITING",
+    ORDERED = "ORDERED",
+    RECEIVED = "RECEIVED",
+    ON_HOLD = "ON_HOLD",
+    CANCELLED = "CANCELLED",
 }
 
 export enum Sex {
@@ -42,7 +40,7 @@ export enum Sex {
     FEMALE = "FEMALE",
     UNKNOWN = "UNKNOWN"
 }
-export interface Laboratory {
+export interface Vessel {
     id: string
     createdAt: Date
     updatedAt: Date | null
@@ -78,15 +76,15 @@ export interface UserInfo {
     email: string
 }
 
-export interface LaboratoriesContainerProps {
-    userLaboratories: Laboratory[];
+export interface VesselsContainerProps {
+    userVessels: Vessel[];
 }
 
 export interface LaboratoriesViewProps {
     getInitials: (firstName: string, lastName: string) => string;
     setSearchTerm: React.Dispatch<SetStateAction<string>>;
     formatDate: (date: Date | string) => string
-    filteredLaboratories: Laboratory[] | [];
+    filteredLaboratories: Vessel[] | [];
     handleLabClick: (labId: string) => void;
     handleCreateLab: VoidFunction;
     handleJoinLab: VoidFunction;

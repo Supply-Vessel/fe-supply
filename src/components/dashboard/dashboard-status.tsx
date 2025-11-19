@@ -1,15 +1,15 @@
-import type { Animal, Experiment, Task } from "@/src/app/[labId]/dashboard/types"
+import type { Experiment, Request, Task } from "@/src/app/[labId]/dashboard/types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Beaker, MousePointer, ClipboardList, AlertTriangle } from "lucide-react"
 import { useMemo } from "react"
 
 interface DashboardStatusProps {
   experiments: Experiment[];
-  animals: Animal[];
+  requests: Request[];
   tasks: Task[];
   previousMonthData?: {
     experiments: number;
-    animals: number;
+    requests: number;
     tasks: number;
   };
 }
@@ -35,12 +35,11 @@ function calculatePercentageChange(current: number, previous: number): {
   };
 }
 
-function formatPercentageText(current: number, previous: number, type: 'animals' | 'experiments' | 'tasks'): { 
+function formatPercentageText(current: number, previous: number, type: 'requests' | 'experiments' | 'tasks'): { 
   text: string; 
   className: string 
 } {
-  if (type === 'animals') {
-    // Для животных показываем проценты
+  if (type === 'requests') {
     const { percentage, isPositive, isZero } = calculatePercentageChange(current, previous);
     
     if (isZero) {
@@ -105,10 +104,10 @@ function formatPercentageText(current: number, previous: number, type: 'animals'
   };
 }
 
-export function DashboardStatus({animals, experiments, tasks, previousMonthData}: DashboardStatusProps) {
-  const animalsChange = useMemo(() => previousMonthData ?
-    formatPercentageText(animals.length, previousMonthData.animals, 'animals') : 
-    { text: "No previous data", className: "text-xs text-gray-500" }, [animals, previousMonthData]);
+export function DashboardStatus({requests, experiments, tasks, previousMonthData}: DashboardStatusProps) {
+  const requestsChange = useMemo(() => previousMonthData ?
+    formatPercentageText(requests.length, previousMonthData.requests, 'requests') : 
+    { text: "No previous data", className: "text-xs text-gray-500" }, [requests, previousMonthData]);
 
   const experimentsChange = useMemo(() => previousMonthData ? 
     formatPercentageText(experiments.length, previousMonthData.experiments, 'experiments') : 
@@ -122,17 +121,17 @@ export function DashboardStatus({animals, experiments, tasks, previousMonthData}
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 w-[315px] md:w-full">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Animals</CardTitle>
+          <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
           <MousePointer className="h-4 w-4 text-blue-600" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{animals.length}</div>
-          <p className={animalsChange.className}>{animalsChange.text}</p>
+          <div className="text-2xl font-bold">{requests.length}</div>
+          <p className={requestsChange.className}>{requestsChange.text}</p>
         </CardContent>
       </Card>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Active Experiments</CardTitle>
+          <CardTitle className="text-sm font-medium">Active Requests</CardTitle>
           <Beaker className="h-4 w-4 text-purple-600" />
         </CardHeader>
         <CardContent>
@@ -142,7 +141,7 @@ export function DashboardStatus({animals, experiments, tasks, previousMonthData}
       </Card>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Pending Tasks</CardTitle>
+          <CardTitle className="text-sm font-medium">Pending Requests</CardTitle>
           <ClipboardList className="h-4 w-4 text-yellow-600" />
         </CardHeader>
         <CardContent>

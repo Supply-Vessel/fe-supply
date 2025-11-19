@@ -1,7 +1,7 @@
 // frontend/middleware.js (в корне проекта Next.js)
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_DATABASE_URL || 'http://localhost:3001';
+const BACKEND_URL = process.env.NEXT_PUBLIC_LOCAL_DATABASE_URL || 'http://localhost:3001';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

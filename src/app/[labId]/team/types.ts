@@ -1,5 +1,5 @@
 import type { AccessStatus, AnimalStatus, Role, Sex } from "../../account/types";
-import type { ActivityLevel, RecordType } from "../animals/types";
+import type { ActivityLevel, RecordType } from "../requests/types";
 
 export interface InitialMembersTypes {
     id: string;

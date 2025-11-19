@@ -1,4 +1,5 @@
-import type { AnimalStatus, AnimalType, ExperimentStatus, Laboratory, Sex } from "../../account/types";
+import type { PaymentStatus, PoStatus, RequestType, TSIConfirm } from "@/src/components/requests/types";
+import type { ExperimentStatus, RequestStatus } from "../../account/types";
 
 export interface PageProps {
     params: {
@@ -7,23 +8,22 @@ export interface PageProps {
     }
 }
 
-export interface Animal {
-    newAnimalType?: AnimalType;
-    acquisitionDate: string;
-    animalType: AnimalType;
-    laboratory: Laboratory;
-    status: AnimalStatus;
-    animalTypeId: string;
-    laboratoryId: string;
-    birthDate?: string;
+export interface Request {
+    id: string;
+    tsiConfirm?: TSIConfirm;
     identifier: string;
-    genotype?: string;
-    location?: string;
-    strain?: string;
-    origin?: string;
-    name?: string;
-    id?: string;
-    sex?: Sex;
+    poStatus: PoStatus;
+    poNumber?: string;
+    paymentStatus?: PaymentStatus;
+    description?: string;
+    status: RequestStatus;
+    offerNumber?: string;
+    companyOfOrder?: string;
+    countryOfOrder?: string;
+    requestType: RequestType;
+    vesselId: string;
+    createdAt: string;
+    updatedAt: string;
 }
 export interface Experiment {
     status?: ExperimentStatus;
@@ -46,24 +46,13 @@ export interface Task {
     id: string;
 }
 
-export interface DashboardViewProps {
-    experiments: Experiment[];
-    animals: Animal[];
-    tasks: Task[];
-    previousMonthData?: {
-        experiments: number;
-        animals: number;
-        tasks: number;
-    };
-}
-
 export interface DashboardContainerProps {
     experiments: Experiment[];
-    animals: Animal[];
+    requests: Request[];
     tasks: Task[];
     previousMonthData?: {
         experiments: number;
-        animals: number;
+        requests: number;
         tasks: number;
     };
 }

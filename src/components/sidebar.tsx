@@ -13,11 +13,12 @@ import {
   ClipboardList,
   FileBarChart,
   ChevronLeft,
+  PackageOpen,
   Settings,
   BookUser,
   LogOut,
-  Rat,
   IdCard,
+  Ship,
 } from "lucide-react"
 
 export function Sidebar() {
@@ -38,35 +39,13 @@ export function Sidebar() {
           {isOpen ? (
             <div className="flex items-center gap-2">
               <div onClick={toggle} className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center cursor-pointer">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#2563EB"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="w-4 h-4"
-                >
-                  <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-                </svg>
+                <Ship className="h-4 w-4 text-blue-600" />
               </div>
               <span className="font-bold text-lg">{labId}</span>
             </div>
           ) : (
             <div onClick={toggle} className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center cursor-pointer">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#2563EB"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-4 h-4"
-              >
-                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-              </svg>
+              <Ship className="h-4 w-4 text-blue-600" />
             </div>
           )}
         </div>
@@ -86,13 +65,13 @@ export function Sidebar() {
               isOpen={isOpen}
             />
             <NavItem
-              href={`/${labId}/animals`}
-              icon={Rat}
-              label="Animals"
-              isActive={pathname.startsWith(`/${labId}/animals`)}
+              href={`/${labId}/requests`}
+              icon={PackageOpen}
+              label="Requests Status"
+              isActive={pathname.startsWith(`/${labId}/requests`)}
               isOpen={isOpen}
             />
-            <NavItem
+            {/* <NavItem
               href={`/${labId}/experiments`}
               icon={Flask}
               label="Experiments"
@@ -119,7 +98,7 @@ export function Sidebar() {
               label="Settings"
               isActive={pathname.startsWith(`/${labId}/settings`)}
               isOpen={isOpen}
-            />
+            /> */}
             <NavItem
               href={`/${labId}/team`}
               icon={BookUser}
@@ -137,7 +116,7 @@ export function Sidebar() {
           onClick={() => {router.push("/account")}}
         >
           <IdCard className="h-4 w-4 mr-2" />
-          {isOpen && <span>Account / Labs</span>}
+          {isOpen && <span>Account / Vessels</span>}
         </Button>
         <Button
           variant="ghost"

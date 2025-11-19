@@ -1,38 +1,38 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
-import { CheckCircle, Users, Stethoscope, UserCheck, Shield } from "lucide-react"
+import { CheckCircle, Users, Anchor, UserCheck, Shield } from 'lucide-react'
 
 const benefits = {
-    researchers: [
-        "Streamlined data collection and analysis",
-        "Automated protocol compliance tracking",
-        "Real-time animal health monitoring",
-        "Integrated breeding management",
-        "Comprehensive reporting tools",
-        "Mobile access for field work",
+    captains: [
+        "Real-time vessel monitoring and control",
+        "Automated safety compliance tracking",
+        "Weather and route optimization",
+        "Integrated crew management",
+        "Comprehensive operational reporting",
+        "Mobile access for bridge operations",
     ],
-    veterinarians: [
-        "Centralized health record management",
-        "Automated health alert notifications",
-        "Treatment history tracking",
-        "Preventive care scheduling",
+    operators: [
+        "Centralized fleet management",
+        "Automated maintenance alerts",
+        "Fuel consumption tracking",
+        "Preventive maintenance scheduling",
         "Regulatory compliance documentation",
-        "Multi-site practice management",
+        "Multi-vessel operation management",
     ],
-    administrators: [
-        "Complete facility oversight",
+    managers: [
+        "Complete fleet oversight",
         "Resource allocation optimization",
         "Compliance audit preparation",
         "Cost tracking and budgeting",
-        "Staff performance monitoring",
+        "Performance monitoring",
         "Institutional reporting",
     ],
     technicians: [
-        "Simplified daily care workflows",
+        "Simplified maintenance workflows",
         "Mobile-friendly task management",
-        "Automated feeding schedules",
-        "Quick health status updates",
-        "Equipment maintenance tracking",
+        "Automated inspection schedules",
+        "Quick status updates",
+        "Equipment service tracking",
         "Training module access",
     ],
 }
@@ -43,27 +43,26 @@ export function BenefitsSection() {
             <div className="container mx-auto px-4 lg:px-8">
                 <div className="text-center mb-16">
                     <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                        Designed for Every Role in Your Laboratory
+                        Designed for Every Role in Your Fleet
                     </h2>
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                        LabAssist adapts to the unique needs of each team member, from researchers to veterinarians, ensuring
-                        everyone has the tools they need to excel.
+                        ShipHub adapts to the unique needs of each team member, from captains to technicians, ensuring everyone has the tools they need to excel.
                     </p>
                 </div>
 
-                <Tabs defaultValue="researchers" className="max-w-4xl mx-auto">
+                <Tabs defaultValue="captains" className="max-w-4xl mx-auto">
                     <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 mb-8">
-                        <TabsTrigger value="researchers" className="flex items-center gap-2">
+                        <TabsTrigger value="captains" className="flex items-center gap-2">
                             <Users className="h-4 w-4" />
-                            <span className="hidden sm:inline">Researchers</span>
+                            <span className="hidden sm:inline">Captains</span>
                         </TabsTrigger>
-                        <TabsTrigger value="veterinarians" className="flex items-center gap-2">
-                            <Stethoscope className="h-4 w-4" />
-                            <span className="hidden sm:inline">Veterinarians</span>
+                        <TabsTrigger value="operators" className="flex items-center gap-2">
+                            <Anchor className="h-4 w-4" />
+                            <span className="hidden sm:inline">Operators</span>
                         </TabsTrigger>
-                        <TabsTrigger value="administrators" className="flex items-center gap-2">
+                        <TabsTrigger value="managers" className="flex items-center gap-2">
                             <Shield className="h-4 w-4" />
-                            <span className="hidden sm:inline">Administrators</span>
+                            <span className="hidden sm:inline">Managers</span>
                         </TabsTrigger>
                         <TabsTrigger value="technicians" className="flex items-center gap-2">
                             <UserCheck className="h-4 w-4" />

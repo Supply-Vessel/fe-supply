@@ -1,13 +1,13 @@
 import {AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle} from "@/src/components/ui/alert-dialog";
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "@/src/components/ui/dialog";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/src/components/ui/select";
-import { InitialMembersTypes, NewMemberTypes, type AnimalEnums } from "./types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar";
+import { InitialMembersTypes, NewMemberTypes, type AnimalEnums } from "./types";
 import { Mail, Phone, Plus, Search, Trash2, UserPlus } from "lucide-react";
 import { Card, CardContent } from "@/src/components/ui/card";
+import { AccessStatus, Role } from "../../account/types";
 import type { Dispatch, SetStateAction } from "react";
 import { Button } from "@/src/components/ui/button";
-import { AccessStatus, Role } from "../../account/types";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import { Badge } from "@/src/components/ui/badge";
@@ -53,7 +53,7 @@ export default function TeamView (props: TeamViewProps) {
         userId,
     } = props;
 
-    const labOwner = members.find((member) => userId === member.userId);
+    const vesselOwner = members.find((member) => userId === member.userId);
 
     return (
         <div className="space-y-6">
@@ -61,7 +61,7 @@ export default function TeamView (props: TeamViewProps) {
             <div>
                 <h1 className="text-2xl font-bold tracking-tight">Team Members</h1>
                 <p className="text-gray-500">
-                Manage your laboratory team and personnel
+                Manage your vessel team and personnel
                 </p>
             </div>
             <Button
@@ -131,7 +131,7 @@ export default function TeamView (props: TeamViewProps) {
                                     .join("") || ""}
                             </AvatarFallback>
                         </Avatar>
-                        {(member.role !== Role.OWNER && member?.userId !== userId && labOwner?.role === Role.OWNER) &&
+                        {(member.role !== Role.SUPPLIER && member?.userId !== userId && vesselOwner?.role === Role.SUPPLIER) &&
                             <Button
                                 variant="ghost"
                                 size="icon"

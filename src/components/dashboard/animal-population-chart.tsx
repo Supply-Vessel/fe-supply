@@ -1,54 +1,49 @@
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { ChartContainer, ChartTooltipContent } from "@/src/components/ui/chart"
-import type { Animal } from "@/src/app/[labId]/dashboard/types"
+import type { Request } from "@/src/app/[labId]/dashboard/types"
 import { useMemo } from "react"
 
 const colors = [
-  "hsl(221, 83%, 53%)",
-  "hsl(262, 80%, 50%)",
-  "hsl(142, 71%, 45%)",
-  "hsl(346, 87%, 43%)",
-  "hsl(43, 96%, 55%)",
-  "hsl(178, 100%, 29%)",
-  "hsl(280, 100%, 70%)",
-  "hsl(24, 100%, 50%)",
-]
+  { label: "Engine", color: "#FFA500" },
+  { label: "Electrical", color: "#808080" },
+  { label: "Deck", color: "#00FFFF" },
+] as const
 
-function processAnimalData(animals: Animal[]): { chartData: any[], animalTypes: string[] } {
-  if (!animals || animals.length === 0) {
-    return { chartData: [], animalTypes: [] }
+function processAnimalData(requests: Request[]): { chartData: any[], requestTypes: string[] } {
+  if (!requests || requests.length === 0) {
+    return { chartData: [], requestTypes: [] }
   }
 
   const thirtyDaysAgo = new Date()
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-  const recentAnimals = animals.filter(animal => {
-    const acquisitionDate = new Date(animal.acquisitionDate)
-    return acquisitionDate >= thirtyDaysAgo
+  const recentRequests = requests.filter(request => {
+    const createdAt = new Date(request.createdAt)
+    return createdAt >= thirtyDaysAgo
   })
 
-  if (recentAnimals.length === 0) {
-    return { chartData: [], animalTypes: [] }
+  if (recentRequests.length === 0) {
+    return { chartData: [], requestTypes: [] }
   }
 
-  const animalsByDate = recentAnimals.reduce((acc, animal) => {
-    const date = new Date(animal.acquisitionDate)
+  const requestsByDate = recentRequests.reduce((acc, request) => {
+    const date = new Date(request.createdAt)
     const dateKey = date.toISOString().split('T')[0] // YYYY-MM-DD format
     
     if (!acc[dateKey]) {
       acc[dateKey] = {}
     }
     
-    const animalType = animal.animalType.name
-    if (!acc[dateKey][animalType]) {
-      acc[dateKey][animalType] = 0
+    const requestType = request.requestType
+    if (!acc[dateKey][requestType]) {
+      acc[dateKey][requestType] = 0
     }
     
-    acc[dateKey][animalType]++
+    acc[dateKey][requestType]++
     return acc
   }, {} as Record<string, Record<string, number>>)
 
-  const allAnimalTypes = Array.from(new Set(recentAnimals.map(a => a.animalType.name)))
+  const allRequestTypes = Array.from(new Set(recentRequests.map(r => r.requestType)))
   
   const dateRange = []
   for (let i = 29; i >= 0; i--) {
@@ -65,18 +60,18 @@ function processAnimalData(animals: Animal[]): { chartData: any[], animalTypes: 
     
     const dataPoint: any = { date: formattedDate }
     
-    allAnimalTypes.forEach(type => {
-      dataPoint[type] = (animalsByDate[dateKey] && animalsByDate[dateKey][type]) || 0
+    allRequestTypes.forEach(type => {
+      dataPoint[type] = (requestsByDate[dateKey] && requestsByDate[dateKey][type]) || 0
     })
     
     return dataPoint
   })
 
-  return { chartData, animalTypes: allAnimalTypes }
+  return { chartData, requestTypes: allRequestTypes }
 }
 
-export function AnimalPopulationChart({animals}: {animals: Animal[]}) {
-  const { chartData, animalTypes } = useMemo(() => processAnimalData(animals), [animals])
+export function AnimalPopulationChart({requests}: {requests: Request[]}) {
+  const { chartData, requestTypes } = useMemo(() => processAnimalData(requests), [requests])
 
   if (!chartData || chartData.length === 0) {
     return (
@@ -86,13 +81,13 @@ export function AnimalPopulationChart({animals}: {animals: Animal[]}) {
     )
   }
 
-  const config = useMemo(() => animalTypes.reduce((acc: Record<string, { label: string; color: string }>, type: string, index: number) => {
+  const config = useMemo(() => requestTypes.reduce((acc: Record<string, { label: string; color: string }>, type: string, index: number) => {
     acc[type] = {
       label: type,
-      color: colors[index % colors.length],
+      color: colors[index % colors.length].color,
     }
     return acc
-  }, {} as Record<string, { label: string; color: string }>), [animalTypes])
+  }, {} as Record<string, { label: string; color: string }>), [requestTypes])
 
   return (
     <ChartContainer
@@ -110,14 +105,14 @@ export function AnimalPopulationChart({animals}: {animals: Animal[]}) {
             tickFormatter={(value) => `${value}`}
           />
           <Tooltip content={<ChartTooltipContent />} />
-          {animalTypes.map((type: string, index: number) => (
+          {requestTypes.map((type: string, index: number) => (
             <Line
               key={type}
               type="monotone"
               dataKey={type}
               strokeWidth={2}
               activeDot={{ r: 6 }}
-              stroke={colors[index % colors.length]}
+              stroke={colors[index % colors.length].color}
             />
           ))}
         </LineChart>

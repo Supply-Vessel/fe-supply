@@ -1,6 +1,6 @@
 "use client"
 
-import { EyeIcon, EyeOffIcon, CheckCircle, AlertCircle, ArrowLeft } from "lucide-react"
+import { EyeIcon, EyeOffIcon, CheckCircle, AlertCircle, ArrowLeft, ShipWheel, AnchorIcon } from "lucide-react"
 import { setUser } from "@/src/redux/slices/userSlice"
 import { CONFIRMED_EMAIL } from "@/src/lib/variables"
 import React, { useCallback, useMemo, useState } from "react"
@@ -124,17 +124,10 @@ export default function SignUpPage() {
         
         <div>
           <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-600">
-            <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 7.172V5L8 4z"
-              />
-            </svg>
+            <AnchorIcon className="h-10 w-10 text-white animate-pulse" />
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Create your account</h2>
-          <p className="mt-2 text-center text-sm text-gray-600">Join the leading laboratory management platform</p>
+          <p className="mt-2 text-center text-sm text-gray-600">Join the leading maritime supply management platform</p>
         </div>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">

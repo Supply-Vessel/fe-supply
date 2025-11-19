@@ -1,6 +1,6 @@
 import { Button } from "@/src/components/ui/button"
-import { ArrowRight, Shield, Users, BarChart3 } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { ArrowRight, Shield, Users, BarChart3 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 export function HeroSection() {
     const router = useRouter();
@@ -11,11 +11,10 @@ export function HeroSection() {
                     <div className="space-y-8">
                         <div className="space-y-4">
                             <h1 className="text-4xl lg:text-6xl font-bold tracking-tight text-gray-900">
-                                Advanced Laboratory Animal Management
+                                Advanced Maritime Supply Management
                             </h1>
                             <p className="text-xl text-gray-600 leading-relaxed">
-                                Streamline your research with LabAssist - the comprehensive platform for monitoring, tracking, and
-                                managing laboratory animals with precision and compliance.
+                                Streamline your maritime operations with ShipHub - the comprehensive platform for managing ship supplies, inventory, and logistics with precision and efficiency.
                             </p>
                         </div>
 
@@ -46,21 +45,21 @@ export function HeroSection() {
                                     <Shield className="h-8 w-8 text-[#10B981]" />
                                 </div>
                                 <div className="text-2xl font-bold text-gray-900">99.9%</div>
-                                <div className="text-sm text-gray-600">Compliance Rate</div>
+                                <div className="text-sm text-gray-600">Uptime Guarantee</div>
                             </div>
                             <div className="text-center">
                                 <div className="flex justify-center mb-2">
                                     <Users className="h-8 w-8 text-[#2563EB]" />
                                 </div>
-                                <div className="text-2xl font-bold text-gray-900">500+</div>
-                                <div className="text-sm text-gray-600">Research Labs</div>
+                                <div className="text-2xl font-bold text-gray-900">1000+</div>
+                                <div className="text-sm text-gray-600">Shipping Companies</div>
                             </div>
                             <div className="text-center">
                                 <div className="flex justify-center mb-2">
                                     <BarChart3 className="h-8 w-8 text-[#8B5CF6]" />
                                 </div>
-                                <div className="text-2xl font-bold text-gray-900">1M+</div>
-                                <div className="text-sm text-gray-600">Animals Tracked</div>
+                                <div className="text-2xl font-bold text-gray-900">50K+</div>
+                                <div className="text-sm text-gray-600">Vessels Managed</div>
                             </div>
                         </div>
                     </div>
@@ -69,7 +68,7 @@ export function HeroSection() {
                         <div className="bg-white rounded-2xl shadow-2xl p-8 border border-gray-100">
                             <div className="space-y-6">
                                 <div className="flex items-center justify-between">
-                                    <h3 className="text-lg font-semibold text-gray-900">Animal Overview</h3>
+                                    <h3 className="text-lg font-semibold text-gray-900">Supply Overview</h3>
                                     <div className="flex space-x-2">
                                         <div className="w-3 h-3 bg-[#10B981] rounded-full"></div>
                                         <div className="w-3 h-3 bg-[#F59E0B] rounded-full"></div>
@@ -81,32 +80,32 @@ export function HeroSection() {
                                     <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                                         <div className="flex items-center space-x-3">
                                             <div className="w-2 h-2 bg-[#10B981] rounded-full"></div>
-                                            <span className="text-sm font-medium">Laboratory Mice</span>
+                                            <span className="text-sm font-medium">Fuel & Lubricants</span>
                                         </div>
-                                        <span className="text-sm text-gray-600">1,247 active</span>
+                                        <span className="text-sm text-gray-600">892 active</span>
                                     </div>
 
                                     <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                                         <div className="flex items-center space-x-3">
                                             <div className="w-2 h-2 bg-[#2563EB] rounded-full"></div>
-                                            <span className="text-sm font-medium">Zebrafish</span>
+                                            <span className="text-sm font-medium">Equipment & Parts</span>
                                         </div>
-                                        <span className="text-sm text-gray-600">856 active</span>
+                                        <span className="text-sm text-gray-600">1,245 active</span>
                                     </div>
 
                                     <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                                         <div className="flex items-center space-x-3">
                                             <div className="w-2 h-2 bg-[#8B5CF6] rounded-full"></div>
-                                            <span className="text-sm font-medium">Zebra Finch</span>
+                                            <span className="text-sm font-medium">Spare Parts</span>
                                         </div>
-                                        <span className="text-sm text-gray-600">423 active</span>
+                                        <span className="text-sm text-gray-600">3,087 active</span>
                                     </div>
                                 </div>
 
                                 <div className="pt-4 border-t border-gray-200">
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-gray-600">Health Status</span>
-                                        <span className="font-medium text-[#10B981]">98.5% Healthy</span>
+                                        <span className="text-gray-600">Stock Status</span>
+                                        <span className="font-medium text-[#10B981]">98.2% In Stock</span>
                                     </div>
                                 </div>
                             </div>

@@ -13,8 +13,8 @@ export default async function TeamPage({params}: TeamPageTypes) {
   const { labId } = await params;
   const cookieStore = await cookies();
   const userId = await cookieStore.get('USER_ID')?.value || 'default';
-  const animalEnums = await apiClient.get(`/api/animals/enums`);
-  const laboratoryMembers = await apiClient.get(`/api/laboratory/${userId}/${labId}`);
+  const animalEnums = await apiClient.get(`/api/requests/enums`);
+  const laboratoryMembers = await apiClient.get(`/api/vessel/${userId}/${labId}`);
 
   return (
     <TeamContainer

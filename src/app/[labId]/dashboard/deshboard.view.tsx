@@ -5,9 +5,20 @@ import { SubscriptionStatus } from "@/src/components/dashboard/subscription-stat
 import { NotificationPanel } from "@/src/components/dashboard/notification-panel"
 import { DashboardStatus } from "@/src/components/dashboard/dashboard-status"
 import { UpcomingEvents } from "@/src/components/dashboard/upcoming-events"
-import type { DashboardViewProps } from "./types"
+import type { Experiment, Request, Task } from "./types"
 
-export default function DashboardView({animals, experiments, tasks, previousMonthData}: DashboardViewProps) {
+export interface DashboardViewProps {
+  experiments: Experiment[];
+  requests: Request[];
+  tasks: Task[];
+  previousMonthData?: {
+      experiments: number;
+      requests: number;
+      tasks: number;
+  };
+}
+
+export default function DashboardView({requests, experiments, tasks, previousMonthData}: DashboardViewProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -16,29 +27,29 @@ export default function DashboardView({animals, experiments, tasks, previousMont
       <DashboardStatus 
         previousMonthData={previousMonthData}
         experiments={experiments}
-        animals={animals}
+        requests={requests}
         tasks={tasks}
       />
       <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-7">
         <Card className="lg:col-span-4 w-[315px] md:w-full">
           <CardHeader>
-            <CardTitle>Animal Population</CardTitle>
-            <CardDescription>Population changes over the last 30 days</CardDescription>
+            <CardTitle>Request Activity</CardTitle>
+            <CardDescription>Request changes over the last 30 days</CardDescription>
           </CardHeader>
           <CardContent>
-            <AnimalPopulationChart animals={animals} />
+            <AnimalPopulationChart requests={requests} />
           </CardContent>
         </Card>
         <Card className="lg:col-span-3 w-[315px] md:w-full">
           <CardHeader>
             <CardTitle>Status Statistics</CardTitle>
-            <CardDescription>Current animal status distribution</CardDescription>
+            <CardDescription>Current request status distribution</CardDescription>
           </CardHeader>
           <CardContent>
-            <StatusStatisticsChart animals={animals} />
+            <StatusStatisticsChart requests={requests} />
           </CardContent>
         </Card>
-        <Card className="lg:col-span-4 w-[315px] md:w-full">
+        {/* <Card className="lg:col-span-4 w-[315px] md:w-full">
           <CardHeader>
             <CardTitle>Upcoming Events</CardTitle>
             <CardDescription>Scheduled events for the next 7 days</CardDescription>
@@ -55,9 +66,9 @@ export default function DashboardView({animals, experiments, tasks, previousMont
           <CardContent>
             <NotificationPanel />
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
-      <SubscriptionStatus />
+      {/* <SubscriptionStatus /> */}
     </div>
   )
 }

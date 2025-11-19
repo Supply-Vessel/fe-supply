@@ -10,14 +10,13 @@ export default async function Page ({params}: PageProps) {
   const cookieStore = await cookies();
   const userId = await cookieStore.get('USER_ID')?.value || 'default';
 
-  const animals = await apiClient.get(`/api/animals/${userId}/${labId}/999999/1/${JSON.stringify({})}`);
+  const requests = await apiClient.get(`/api/requests/${userId}/${labId}/999999/1`);
   const experiments = await apiClient.get(`/api/experiments/${userId}/${labId}`);
   const tasks = await apiClient.get(`/api/tasks/${userId}/${labId}`);
-
   return (
     <DashboardContainer 
       experiments={experiments.data}
-      animals={animals.data}
+      requests={requests.data}
       tasks={tasks.data}
     />
   )

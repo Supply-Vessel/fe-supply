@@ -3,7 +3,7 @@
 import { DashboardHeader } from "@/src/components/dashboard/dashboard-header"
 import { SidebarProvider } from "@/src/components/sidebar-provider"
 import { Sidebar } from "@/src/components/sidebar"
-import type { Laboratory } from "../account/types"
+import type { Vessel } from "../account/types"
 import { apiClient } from "@/src/lib/apiClient"
 import { redirect } from 'next/navigation'
 import { cookies } from "next/headers"
@@ -19,9 +19,9 @@ export default async function DashboardLayout({
   const {labId} = await params;
   const cookieStore = await cookies();
   const userId = await cookieStore.get('USER_ID')?.value || 'default';
-  const laboratories = await apiClient.get(`/api/laboratories/${userId}`);
-  const laboratory = await laboratories.data.find((laboratory: Laboratory) => laboratory.name === labId);
-  const laboratoryMembers = await apiClient.get(`/api/laboratory/${userId}/${labId}`);
+  const laboratories = await apiClient.get(`/api/vessels/${userId}`);
+  const laboratory = await laboratories.data.find((laboratory: Vessel) => laboratory.name === labId);
+  const laboratoryMembers = await apiClient.get(`/api/vessel/${userId}/${labId}`);
 
   if(!laboratory) {
     redirect('/account');

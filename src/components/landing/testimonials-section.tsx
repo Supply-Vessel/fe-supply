@@ -1,29 +1,29 @@
 import { Card, CardContent } from "@/src/components/ui/card"
-import { Star } from "lucide-react"
+import { Star } from 'lucide-react'
 
 const testimonials = [
     {
-        name: "Dr. Sarah Chen",
-        role: "Principal Investigator",
-        institution: "Stanford University",
+        name: "Captain James Morrison",
+        role: "Fleet Captain",
+        institution: "Atlantic Shipping Lines",
         content:
-        "LabAssist has revolutionized how we manage our mouse colonies. The breeding tracking and health monitoring features have improved our research efficiency by 40%.",
+        "ShipHub has revolutionized how we manage our fleet operations. The real-time tracking and maintenance scheduling features have improved our efficiency by 40% and reduced unexpected downtime.",
         rating: 5,
     },
     {
-        name: "Dr. Michael Rodriguez",
-        role: "Laboratory Director",
-        institution: "Johns Hopkins University",
+        name: "Dr. Elizabeth Chen",
+        role: "Operations Director",
+        institution: "Pacific Marine Logistics",
         content:
-        "The compliance reporting features are outstanding. We've reduced our audit preparation time from weeks to days, and the automated documentation is incredibly thorough.",
+        "The compliance reporting features are outstanding. We've reduced our regulatory audit preparation time from weeks to days, and the automated documentation is incredibly thorough and accurate.",
         rating: 5,
     },
     {
-        name: "Dr. Emily Watson",
-        role: "Research Veterinarian",
-        institution: "MIT",
+        name: "Robert Williams",
+        role: "Supply Chain Manager",
+        institution: "Global Shipping Solutions",
         content:
-        "As a veterinarian overseeing multiple labs, LabAssist gives me the centralized view I need. The health alerts have helped us catch issues early and improve animal welfare.",
+        "As a logistics manager overseeing multiple vessels, ShipHub gives me the centralized view I need. The inventory alerts have helped us maintain optimal supply levels and reduce costs significantly.",
         rating: 5,
     },
 ]
@@ -34,11 +34,10 @@ export function TestimonialsSection() {
             <div className="container mx-auto px-4 lg:px-8">
                 <div className="text-center mb-16">
                     <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                        Trusted by Leading Research Institutions
+                        Trusted by Leading Shipping Companies
                     </h2>
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                        See how LabAssist is helping researchers and veterinarians worldwide improve their laboratory animal
-                        management.
+                        See how ShipHub is helping shipping companies and maritime operators worldwide optimize their operations and reduce costs.
                     </p>
                 </div>
 

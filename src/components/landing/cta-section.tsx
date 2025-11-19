@@ -1,6 +1,6 @@
 import { Button } from "@/src/components/ui/button"
-import { ArrowRight, CheckCircle } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { ArrowRight, CheckCircle } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 export function CTASection() {
     const router = useRouter();
@@ -8,10 +8,9 @@ export function CTASection() {
         <section className="py-20 bg-gradient-to-br from-[#2563EB] to-[#8B5CF6]">
             <div className="container mx-auto px-4 lg:px-8">
                 <div className="max-w-4xl mx-auto text-center text-white">
-                    <h2 className="text-3xl lg:text-4xl font-bold mb-6">Ready to Transform Your Laboratory Management?</h2>
+                    <h2 className="text-3xl lg:text-4xl font-bold mb-6">Ready to Transform Your Maritime Operations?</h2>
                     <p className="text-xl mb-8 opacity-90">
-                        Join hundreds of research institutions already using LabAssist to improve their animal care and research
-                        outcomes.
+                        Join thousands of shipping companies already using ShipHub to optimize their fleet operations and supply chain management.
                     </p>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">

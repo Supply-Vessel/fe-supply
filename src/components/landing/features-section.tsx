@@ -1,90 +1,77 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
-import {
-    Activity,
-    Calendar,
-    FileText,
-    Heart,
-    Shield,
-    Users,
-    BarChart3,
-    Bell,
-    Database,
-    Microscope,
-    ClipboardList,
-    Settings,
-} from "lucide-react"
+import { Activity, Calendar, FileText, Heart, Shield, Users, BarChart3, Bell, Database, Anchor, ClipboardList, Settings } from 'lucide-react'
 
 const features = [
     {
         icon: Activity,
-        title: "Real-time Monitoring",
-        description: "Track animal health, behavior, and vital signs with continuous monitoring and automated alerts.",
+        title: "Real-time Tracking",
+        description: "Monitor vessel location, fuel consumption, and operational status with continuous tracking and automated alerts.",
         color: "#10B981",
     },
     {
         icon: Calendar,
-        title: "Breeding Management",
-        description: "Comprehensive breeding protocols, genealogy tracking, and reproductive cycle management.",
+        title: "Supply Scheduling",
+        description: "Comprehensive supply chain scheduling, delivery route planning, and port management coordination.",
         color: "#2563EB",
     },
     {
         icon: FileText,
-        title: "Compliance Reporting",
-        description: "Automated regulatory compliance reports and documentation for IACUC and institutional requirements.",
+        title: "Compliance Documentation",
+        description: "Automated regulatory compliance reports and documentation for international maritime requirements.",
         color: "#8B5CF6",
     },
     {
         icon: Heart,
-        title: "Health Tracking",
-        description: "Monitor animal welfare, medical treatments, and veterinary care with detailed health records.",
+        title: "Maintenance Tracking",
+        description: "Monitor vessel maintenance, equipment repair schedules, and preventive maintenance with detailed records.",
         color: "#EF4444",
     },
     {
         icon: Shield,
         title: "Data Security",
-        description: "Enterprise-grade security with encrypted data storage and role-based access controls.",
+        description: "Enterprise-grade security with encrypted data storage and role-based access controls for maritime operations.",
         color: "#64748B",
     },
     {
         icon: Users,
         title: "Team Collaboration",
-        description: "Multi-user access with customizable permissions for researchers, technicians, and veterinarians.",
+        description: "Multi-user access with customizable permissions for captains, crew, operators, and shore management.",
         color: "#F59E0B",
     },
     {
         icon: BarChart3,
         title: "Analytics Dashboard",
-        description: "Comprehensive analytics and insights to optimize research outcomes and animal welfare.",
+        description: "Comprehensive analytics and insights to optimize fleet operations and reduce operational costs.",
         color: "#2563EB",
     },
     {
         icon: Bell,
         title: "Smart Notifications",
-        description: "Intelligent alerts for feeding schedules, health concerns, and protocol milestones.",
+        description: "Intelligent alerts for fuel levels, maintenance due dates, supply deliveries, and port schedules.",
         color: "#10B981",
     },
     {
         icon: Database,
         title: "Data Integration",
-        description: "Seamless integration with laboratory equipment and existing research management systems.",
+        description: "Seamless integration with vessel equipment, port systems, and existing logistics management systems.",
         color: "#8B5CF6",
     },
     {
-        icon: Microscope,
-        title: "Research Protocols",
-        description: "Standardized protocols for different animal types with customizable experimental procedures.",
+        icon: Anchor,
+        title: "Maritime Protocols",
+        description: "Standardized protocols for different vessel types with customizable operational procedures.",
         color: "#EF4444",
     },
     {
         icon: ClipboardList,
         title: "Inventory Management",
-        description: "Track supplies, medications, and equipment with automated reorder notifications.",
+        description: "Track supplies, fuel reserves, spare parts, and materials with automated reorder notifications.",
         color: "#F59E0B",
     },
     {
         icon: Settings,
         title: "Customizable Workflows",
-        description: "Adapt the system to your laboratory's specific needs with flexible configuration options.",
+        description: "Adapt the system to your fleet's specific needs with flexible configuration options.",
         color: "#64748B",
     },
 ]
@@ -95,11 +82,10 @@ export function FeaturesSection() {
             <div className="container mx-auto px-4 lg:px-8">
                 <div className="text-center mb-16">
                     <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                        Everything You Need for Laboratory Animal Management
+                        Everything You Need for Maritime Supply Management
                     </h2>
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                        LabAssist provides comprehensive tools to streamline your research workflow while ensuring the highest
-                        standards of animal care and regulatory compliance.
+                        ShipHub provides comprehensive tools to streamline your supply chain and fleet operations while ensuring regulatory compliance and operational efficiency.
                     </p>
                 </div>
 

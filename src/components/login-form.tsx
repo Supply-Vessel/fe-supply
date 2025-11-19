@@ -33,10 +33,10 @@ export function LoginForm() {
       });
       
       if(response.success) {
-        if(!response.laboratory) {
-          router.push("/laboratory-setup");
+        if(!response.vessel) {
+          router.push("/vessel-setup");
         } else {
-          router.push(`account`);
+          router.push(`/account`);
         }
         document.cookie = `USER_ID=${response.user.userId}; path=/; SameSite=Strict`;
         document.cookie = `${CONFIRMED_EMAIL}=${response.user.confirmedEmail}; path=/; max-age=3600`;
@@ -61,7 +61,7 @@ export function LoginForm() {
               type="email"
               autoComplete="email"
               required
-              placeholder="name@laboratory.com"
+              placeholder="name@supply.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full"
