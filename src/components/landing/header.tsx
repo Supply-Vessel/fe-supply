@@ -25,7 +25,7 @@ export function Header() {
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center space-x-4">
                         <Button onClick={() => router.push("/signin")} variant="ghost" className="text-gray-600 hover:text-[#2563EB]">
-                            Sign In /<span className="text-[#2563EB]">Guest Access</span>
+                            <span className="text-[#2563EB]">Sign In</span>
                         </Button>
                         <Button onClick={() => router.push("/signup")} className="bg-[#2563EB] hover:bg-[#2563EB]/90 text-white">Sign Up</Button>
                     </div>
