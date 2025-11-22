@@ -3,27 +3,27 @@ import Cookies from 'js-cookie';
 export class AuthService {
   static TOKEN_KEY = 'auth-token';
   
-  // Сохранение токена в cookies (безопаснее чем localStorage)
+  // Save token in cookies (safer than localStorage)
   static setToken(token: string) {
     Cookies.set(this.TOKEN_KEY, token, {
-      expires: 1, // 1 день
+      expires: 1, // 1 day
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict'
     });
   }
   
-  // Получение токена
+  // Get token
   static getToken() {
 
     return Cookies.get(this.TOKEN_KEY);
   }
   
-  // Удаление токена
+  // Remove token
   static removeToken() {
     Cookies.remove(this.TOKEN_KEY);
   }
   
-  // Логин
+  // Login
   static async login(email: string, password: string) {
     try {
       const dataSuccess = {email, password}
@@ -49,13 +49,13 @@ export class AuthService {
     }
   }
   
-  // Логаут
+  // Logout
   static logout() {
     this.removeToken();
     window.location.href = '/signin';
   }
   
-  // Получение данных пользователя с бекенда
+  // Get current user from backend
   static async getCurrentUser() {
     const token = this.getToken();
     if (!token) return null;

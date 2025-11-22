@@ -1,6 +1,5 @@
 "use client"
 
-import { useAppDispatch, useAppSelector } from "../lib/hooks"
 import { setUser } from "@/src/redux/slices/userSlice"
 import React, { useCallback, useState } from "react"
 import { Button } from "@/src/components/ui/button"
@@ -8,6 +7,7 @@ import { CONFIRMED_EMAIL } from "../lib/variables"
 import { EyeIcon, EyeOffIcon } from "lucide-react"
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
+import { useAppDispatch } from "../lib/hooks"
 import { AuthService } from "@/src/lib/auth"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
@@ -27,7 +27,7 @@ export function LoginForm() {
     setIsLoading(true)
 
     try {
-      const response = await AuthService.login(email || process.env.NEXT_PUBLIC_GUEST_EMAIL as string, password || process.env.NEXT_PUBLIC_GUEST_PASSWORD as string);
+      const response = await AuthService.login(email, password);
       toast(`${response.message || response.error}`, {
         description: `${response?.user.firstName} ${response?.user.lastName} - ${response?.user.institution}`
       });

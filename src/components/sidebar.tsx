@@ -8,13 +8,9 @@ import { cn } from "@/src/lib/utils"
 import type React from "react"
 import Link from "next/link"
 import {
-  FlaskRoundIcon as Flask,
   LayoutDashboard,
-  ClipboardList,
-  FileBarChart,
   ChevronLeft,
   PackageOpen,
-  Settings,
   BookUser,
   LogOut,
   IdCard,
@@ -71,34 +67,6 @@ export function Sidebar() {
               isActive={pathname.startsWith(`/${vesselId}/requests`)}
               isOpen={isOpen}
             />
-            {/* <NavItem
-              href={`/${vesselId}/experiments`}
-              icon={Flask}
-              label="Experiments"
-              isActive={pathname.startsWith(`/${vesselId}/experiments`)}
-              isOpen={isOpen}
-            />
-            <NavItem
-              href={`/${vesselId}/tasks`}
-              icon={ClipboardList}
-              label="Tasks"
-              isActive={pathname.startsWith(`/${vesselId}/tasks`)}
-              isOpen={isOpen}
-            />
-            <NavItem
-              href={`/${vesselId}/reports`}
-              icon={FileBarChart}
-              label="Reports"
-              isActive={pathname.startsWith(`/${vesselId}/reports`)}
-              isOpen={isOpen}
-            />
-            <NavItem
-              href={`/${vesselId}/settings`}
-              icon={Settings}
-              label="Settings"
-              isActive={pathname.startsWith(`/${vesselId}/settings`)}
-              isOpen={isOpen}
-            /> */}
             <NavItem
               href={`/${vesselId}/team`}
               icon={BookUser}
