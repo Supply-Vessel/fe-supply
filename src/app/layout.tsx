@@ -8,8 +8,8 @@ import "@/src/app/globals.css"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "LabAssist - Laboratory Animal Management System",
-  description: "Professional web application for scientific laboratories to monitor and manage laboratory animals",
+  title: "Vessel Management System - Vessel Tracking System",
+  description: "Professional web application for tracking vessels and managing vessel data",
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
