@@ -18,12 +18,12 @@ import { toast } from "sonner"
 interface RequestsListProps {
   handleUpdateDataPagination: (data: {page?: number, pageSize?: number, defaultType: RequestType}) => void;
   setPagination: (pagination: RequestPagination) => void;
+  setOpenEditRequestDialog: (open: boolean) => void;
+  setOpenAddRequestDialog: (open: boolean) => void;
   setSelectedRequest: (request: Request) => void;
   onSave: (request: Partial<Request>) => void;
   onAdd: (request: Partial<Request>) => void;
   requestPagination: RequestPagination;
-  setOpenEditRequestDialog: (open: boolean) => void;
-  setOpenAddRequestDialog: (open: boolean) => void;
   requestEnums: RequestEnums;
   defaultType?: RequestType;
   requests: Request[];
@@ -48,6 +48,8 @@ interface ColumnVisibility {
   paymentStatus: boolean;
   companyOfOrder: boolean;
   countryOfOrder: boolean;
+  wayBillNumber: boolean;
+  storeLocation: boolean;
 }
 
 export function RequestsList({requests, requestPagination, setPagination, handleUpdateDataPagination, onSave, onAdd, defaultType, requestEnums, setSelectedRequest, setOpenEditRequestDialog, setOpenAddRequestDialog}: RequestsListProps) {
@@ -69,11 +71,13 @@ export function RequestsList({requests, requestPagination, setPagination, handle
     paymentStatus: true,
     companyOfOrder: true,
     countryOfOrder: true,
+    wayBillNumber: true,
+    storeLocation: true,
   })
   const [showColumnSelect, setShowColumnSelect] = useState(false)
 
   const params = useParams();
-  const { labId } = params;
+  const {vesselId } = params;
   
   const currentRequests = requests
   const currentPage = requestPagination.currentPage
@@ -170,7 +174,7 @@ export function RequestsList({requests, requestPagination, setPagination, handle
       description: "",
       status: RequestStatus.WAITING,
       poStatus: PoStatus.WITHOUT_PO,
-      vesselId: Array.isArray(labId) ? labId[0] : labId || "",
+      vesselId: Array.isArray(vesselId) ?vesselId[0] :vesselId || "",
       requestType: defaultType as RequestType,
     })
   }
@@ -217,7 +221,9 @@ export function RequestsList({requests, requestPagination, setPagination, handle
       request.tsiConfirm?.toLowerCase().includes(query) ||
       request.paymentStatus?.toLowerCase().includes(query) ||
       request.companyOfOrder?.toLowerCase().includes(query) ||
-      request.countryOfOrder?.toLowerCase().includes(query)
+      request.countryOfOrder?.toLowerCase().includes(query) ||
+      request.storeLocation?.toLowerCase().includes(query) ||
+      request.wayBillNumber?.toLowerCase().includes(query)
     )
   }, [currentRequests, searchQuery])
 
@@ -525,6 +531,9 @@ export function RequestsList({requests, requestPagination, setPagination, handle
         <div className="flex items-center gap-2">
           <Checkbox checked={selectedRequests.length === filteredRequests.length && filteredRequests.length > 0} onCheckedChange={toggleAllRequests} />
           <span className="text-sm text-gray-500">{selectedRequests.length} selected</span>
+          <Badge variant="outline" className={getRequestTypeColor(defaultType)}>
+            {defaultType || "N/A"}
+          </Badge>
         </div>
         <div className="flex items-center gap-2">
           <Input
@@ -546,7 +555,7 @@ export function RequestsList({requests, requestPagination, setPagination, handle
           
           <Popover open={showColumnSelect} onOpenChange={setShowColumnSelect}>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="sm">
+              <Button disabled={view === "grid"} variant="outline" size="sm">
                 Columns
               </Button>
             </PopoverTrigger>
@@ -634,6 +643,22 @@ export function RequestsList({requests, requestPagination, setPagination, handle
                     />
                     <label htmlFor="col-countryOfOrder" className="text-sm cursor-pointer">Country</label>
                   </div>
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="col-storeLocation"
+                      checked={columnVisibility.storeLocation}
+                      onCheckedChange={() => toggleColumnVisibility("storeLocation")}
+                    />
+                    <label htmlFor="col-storeLocation" className="text-sm cursor-pointer">Store Loc.</label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="col-wayBillNumber"
+                      checked={columnVisibility.wayBillNumber}
+                      onCheckedChange={() => toggleColumnVisibility("wayBillNumber")}
+                    />
+                    <label htmlFor="col-wayBillNumber" className="text-sm cursor-pointer">Way Bill No.</label>
+                  </div>
                 </div>
               </div>
             </PopoverContent>
@@ -667,40 +692,36 @@ export function RequestsList({requests, requestPagination, setPagination, handle
               <TableRow>
                 <TableHead className="w-12"></TableHead>
                 {columnVisibility.identifier && <TableHead>Identifier</TableHead>}
-                {columnVisibility.requestType && <TableHead>Request Type</TableHead>}
-                {columnVisibility.description && <TableHead>Description</TableHead>}
-                {columnVisibility.status && <TableHead>Status</TableHead>}
                 {columnVisibility.poStatus && <TableHead>PO Status</TableHead>}
                 {columnVisibility.poNumber && <TableHead>PO Number</TableHead>}
-                {columnVisibility.tsiConfirm && <TableHead>TSI Confirm</TableHead>}
                 {columnVisibility.paymentStatus && <TableHead>Payment Status</TableHead>}
+                {columnVisibility.description && <TableHead>Description</TableHead>}
+                {columnVisibility.status && <TableHead>Status</TableHead>}
+                {columnVisibility.tsiConfirm && <TableHead>TSI Confirm</TableHead>}
                 {columnVisibility.companyOfOrder && <TableHead>Company</TableHead>}
                 {columnVisibility.countryOfOrder && <TableHead>Country</TableHead>}
+                {columnVisibility.storeLocation && <TableHead>Store Loc.</TableHead>}
+                {columnVisibility.wayBillNumber && <TableHead>Way Bill No.</TableHead>}
                 <TableHead className="w-24">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isAddingNew && (
-                <TableRow className="bg-blue-50">
+                <TableRow  className="bg-blue-50">
                   <TableCell>
                     <Checkbox disabled />
                   </TableCell>
                   {columnVisibility.identifier && <TableCell>{renderNewRowCell("identifier")}</TableCell>}
-                  {columnVisibility.requestType && (
-                    <TableCell>
-                      <Badge variant="outline" className={getRequestTypeColor(defaultType)}>
-                        {defaultType || "N/A"}
-                      </Badge>
-                    </TableCell>
-                  )}
-                  {columnVisibility.description && <TableCell>{renderNewRowCell("description")}</TableCell>}
-                  {columnVisibility.status && <TableCell>{renderNewRowCell("status")}</TableCell>}
                   {columnVisibility.poStatus && <TableCell>{renderNewRowCell("poStatus")}</TableCell>}
                   {columnVisibility.poNumber && <TableCell>{renderNewRowCell("poNumber")}</TableCell>}
-                  {columnVisibility.tsiConfirm && <TableCell>{renderNewRowCell("tsiConfirm")}</TableCell>}
                   {columnVisibility.paymentStatus && <TableCell>{renderNewRowCell("paymentStatus")}</TableCell>}
+                  {columnVisibility.description && <TableCell>{renderNewRowCell("description")}</TableCell>}
+                  {columnVisibility.status && <TableCell>{renderNewRowCell("status")}</TableCell>}
+                  {columnVisibility.tsiConfirm && <TableCell>{renderNewRowCell("tsiConfirm")}</TableCell>}
                   {columnVisibility.companyOfOrder && <TableCell>{renderNewRowCell("companyOfOrder")}</TableCell>}
                   {columnVisibility.countryOfOrder && <TableCell>{renderNewRowCell("countryOfOrder")}</TableCell>}
+                  {columnVisibility.storeLocation && <TableCell>{renderNewRowCell("storeLocation")}</TableCell>}
+                  {columnVisibility.wayBillNumber && <TableCell>{renderNewRowCell("wayBillNumber")}</TableCell>}
                   <TableCell>
                     <div className="flex items-center gap-1">
                       <Button
@@ -727,7 +748,11 @@ export function RequestsList({requests, requestPagination, setPagination, handle
               {filteredRequests.map((request) => {
                 const isEditing = editingRows[request.id || ""]
                 return (
-                  <TableRow key={request.id} className={isEditing ? "bg-yellow-50" : getRowColor(request.status)}>
+                  <TableRow
+                    onDoubleClick={() => !isEditing && handleEdit(request.id || "", request)}
+                    className={"cursor-pointer " + (isEditing ? "bg-yellow-50" : getRowColor(request.status))}
+                    key={request.id}
+                  >
                     <TableCell>
                       <Checkbox
                         checked={selectedRequests.includes(request.id || "")}
@@ -740,21 +765,16 @@ export function RequestsList({requests, requestPagination, setPagination, handle
                         {renderEditableCell(request, "identifier", isEditing)}
                       </TableCell>
                     )}
-                    {columnVisibility.requestType && (
-                      <TableCell>
-                        <Badge variant="outline" className={getRequestTypeColor(defaultType)}>
-                          {defaultType || "N/A"}
-                        </Badge>
-                      </TableCell>
-                    )}
-                    {columnVisibility.description && <TableCell>{renderEditableCell(request, "description", isEditing)}</TableCell>}
-                    {columnVisibility.status && <TableCell>{renderEditableCell(request, "status", isEditing)}</TableCell>}
                     {columnVisibility.poStatus && <TableCell>{renderEditableCell(request, "poStatus", isEditing)}</TableCell>}
                     {columnVisibility.poNumber && <TableCell>{renderEditableCell(request, "poNumber", isEditing)}</TableCell>}
-                    {columnVisibility.tsiConfirm && <TableCell>{renderEditableCell(request, "tsiConfirm", isEditing)}</TableCell>}
                     {columnVisibility.paymentStatus && <TableCell>{renderEditableCell(request, "paymentStatus", isEditing)}</TableCell>}
+                    {columnVisibility.description && <TableCell>{renderEditableCell(request, "description", isEditing)}</TableCell>}
+                    {columnVisibility.status && <TableCell>{renderEditableCell(request, "status", isEditing)}</TableCell>}
+                    {columnVisibility.tsiConfirm && <TableCell>{renderEditableCell(request, "tsiConfirm", isEditing)}</TableCell>}
                     {columnVisibility.companyOfOrder && <TableCell>{renderEditableCell(request, "companyOfOrder", isEditing)}</TableCell>}
                     {columnVisibility.countryOfOrder && <TableCell>{renderEditableCell(request, "countryOfOrder", isEditing)}</TableCell>}
+                    {columnVisibility.storeLocation && <TableCell>{renderEditableCell(request, "storeLocation", isEditing)}</TableCell>}
+                    {columnVisibility.wayBillNumber && <TableCell>{renderEditableCell(request, "wayBillNumber", isEditing)}</TableCell>}
                     <TableCell>
                       {isEditing ? (
                         <div className="flex items-center gap-1">
@@ -892,63 +912,92 @@ export function RequestsList({requests, requestPagination, setPagination, handle
         <>
           <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filteredRequests.map((request) => (
-              <div key={request.id} className="relative rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-                <div className="absolute right-2 top-2">
+              <div key={request.id} className="relative flex flex-col rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+                <div className="flex items-start justify-between border-b border-gray-100 p-4 pb-3">
+                  <Badge variant="outline" className={getRequestTypeColor(defaultType)}>
+                    {defaultType || "N/A"}
+                  </Badge>
                   <Checkbox
                     checked={selectedRequests.includes(request.id || "")}
                     onCheckedChange={() => toggleRequestSelection(request.id || "")}
                   />
                 </div>
-                <div className="mb-2">
-                  <Badge variant="outline" className={getRequestTypeColor(defaultType)}>
-                    {defaultType || "N/A"}
-                  </Badge>
-                </div>
-                <h3 className="text-lg font-medium">{request.identifier}</h3>
-                <p className="text-sm text-gray-500 mt-1">{request.description || "No description"}</p>
-                <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
+
+                <div className="flex-1 p-4 space-y-4">
                   <div>
-                    <p className="font-medium">Status</p>
-                    <Badge variant="outline" className={getStatusColor(request.status)}>
-                      {request.status}
-                    </Badge>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                      {request.identifier}
+                    </h3>
+                    <p className="text-sm text-gray-600 line-clamp-2">
+                      {request.description || "No description"}
+                    </p>
                   </div>
-                  <div>
-                    <p className="font-medium">PO Status</p>
-                    <Badge variant="outline" className={getPoStatusColor(request.poStatus)}>
-                      {request.poStatus}
-                    </Badge>
-                  </div>
-                  {request.poNumber && (
-                    <div className="col-span-2">
-                      <p className="font-medium">PO Number</p>
-                      <p className="text-gray-500">{request.poNumber}</p>
-                    </div>
-                  )}
-                  {request.tsiConfirm && (
-                    <div className="col-span-2">
-                      <p className="font-medium">TSI Confirm</p>
-                      <Badge variant="outline" className={getTSIConfirmColor(request.tsiConfirm)}>
-                        {request.tsiConfirm}
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-gray-500">Status:</span>
+                      <Badge variant="outline" className={getStatusColor(request.status)}>
+                        {request.status}
                       </Badge>
                     </div>
-                  )}
-                  {request.paymentStatus && (
-                    <div className="col-span-2">
-                      <p className="font-medium">Payment Status</p>
-                      <Badge variant="outline" className={getPaymentStatusColor(request.paymentStatus)}>
-                        {request.paymentStatus}
+                    
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-gray-500">PO Status:</span>
+                      <Badge variant="outline" className={getPoStatusColor(request.poStatus)}>
+                        {request.poStatus}
                       </Badge>
                     </div>
-                  )}
-                  {request.companyOfOrder && (
-                    <div className="col-span-2">
-                      <p className="font-medium">Company</p>
-                      <p className="text-gray-500">{request.companyOfOrder}</p>
+
+                    {request.tsiConfirm && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-gray-500">TSI Confirm:</span>
+                        <Badge variant="outline" className={getTSIConfirmColor(request.tsiConfirm)}>
+                          {request.tsiConfirm}
+                        </Badge>
+                      </div>
+                    )}
+
+                    {request.paymentStatus && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-gray-500">Payment Status:</span>
+                        <Badge variant="outline" className={getPaymentStatusColor(request.paymentStatus)}>
+                          {request.paymentStatus}
+                        </Badge>
+                      </div>
+                    )}
+                  </div>
+
+                  {(request.poNumber || request.companyOfOrder || request.storeLocation || request.wayBillNumber) && (
+                    <div className="pt-3 border-t border-gray-100 space-y-2">
+                      {request.poNumber && (
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="text-xs font-medium text-gray-500 flex-shrink-0">PO Number:</span>
+                          <span className="text-xs text-gray-700 text-right break-all">{request.poNumber}</span>
+                        </div>
+                      )}
+                      {request.companyOfOrder && (
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="text-xs font-medium text-gray-500 flex-shrink-0">Company:</span>
+                          <span className="text-xs text-gray-700 text-right break-all">{request.companyOfOrder}</span>
+                        </div>
+                      )}
+                      {request.storeLocation && (
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="text-xs font-medium text-gray-500 flex-shrink-0">Store Location:</span>
+                          <span className="text-xs text-gray-700 text-right break-all">{request.storeLocation}</span>
+                        </div>
+                      )}
+                      {request.wayBillNumber && (
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="text-xs font-medium text-gray-500 flex-shrink-0">Way Bill No.:</span>
+                          <span className="text-xs text-gray-700 text-right break-all">{request.wayBillNumber}</span>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
-                <div className="mt-4 flex items-center justify-end">
+                
+                <div className="border-t border-gray-100 p-3">
                   <Button
                     onClick={() => {
                       setSelectedRequest(request),
@@ -956,6 +1005,7 @@ export function RequestsList({requests, requestPagination, setPagination, handle
                     }}
                     variant="outline"
                     size="sm"
+                    className="w-full"
                   >
                     Edit
                   </Button>

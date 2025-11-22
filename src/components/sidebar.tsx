@@ -24,7 +24,7 @@ import {
 export function Sidebar() {
   const { isOpen, toggle } = useSidebar();
   const params = useParams();
-  const { userId, labId } = params;
+  const { userId,vesselId } = params;
   const pathname = usePathname();
   const router = useRouter();
 
@@ -41,7 +41,7 @@ export function Sidebar() {
               <div onClick={toggle} className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center cursor-pointer">
                 <Ship className="h-4 w-4 text-blue-600" />
               </div>
-              <span className="font-bold text-lg">{labId}</span>
+              <span className="font-bold text-lg">{vesselId}</span>
             </div>
           ) : (
             <div onClick={toggle} className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center cursor-pointer">
@@ -58,52 +58,52 @@ export function Sidebar() {
         <div className="px-3 py-2">
           <nav className="flex flex-col gap-1">
             <NavItem
-              href={`/${labId}/dashboard`}
+              href={`/${vesselId}/dashboard`}
               icon={LayoutDashboard}
               label="Dashboard"
-              isActive={pathname === `/${labId}/dashboard`}
+              isActive={pathname === `/${vesselId}/dashboard`}
               isOpen={isOpen}
             />
             <NavItem
-              href={`/${labId}/requests`}
+              href={`/${vesselId}/requests`}
               icon={PackageOpen}
               label="Requests Status"
-              isActive={pathname.startsWith(`/${labId}/requests`)}
+              isActive={pathname.startsWith(`/${vesselId}/requests`)}
               isOpen={isOpen}
             />
             {/* <NavItem
-              href={`/${labId}/experiments`}
+              href={`/${vesselId}/experiments`}
               icon={Flask}
               label="Experiments"
-              isActive={pathname.startsWith(`/${labId}/experiments`)}
+              isActive={pathname.startsWith(`/${vesselId}/experiments`)}
               isOpen={isOpen}
             />
             <NavItem
-              href={`/${labId}/tasks`}
+              href={`/${vesselId}/tasks`}
               icon={ClipboardList}
               label="Tasks"
-              isActive={pathname.startsWith(`/${labId}/tasks`)}
+              isActive={pathname.startsWith(`/${vesselId}/tasks`)}
               isOpen={isOpen}
             />
             <NavItem
-              href={`/${labId}/reports`}
+              href={`/${vesselId}/reports`}
               icon={FileBarChart}
               label="Reports"
-              isActive={pathname.startsWith(`/${labId}/reports`)}
+              isActive={pathname.startsWith(`/${vesselId}/reports`)}
               isOpen={isOpen}
             />
             <NavItem
-              href={`/${labId}/settings`}
+              href={`/${vesselId}/settings`}
               icon={Settings}
               label="Settings"
-              isActive={pathname.startsWith(`/${labId}/settings`)}
+              isActive={pathname.startsWith(`/${vesselId}/settings`)}
               isOpen={isOpen}
             /> */}
             <NavItem
-              href={`/${labId}/team`}
+              href={`/${vesselId}/team`}
               icon={BookUser}
               label="Team"
-              isActive={pathname.startsWith(`/${labId}/team`)}
+              isActive={pathname.startsWith(`/${vesselId}/team`)}
               isOpen={isOpen}
             />
           </nav>

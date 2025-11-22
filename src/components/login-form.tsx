@@ -105,9 +105,6 @@ export function LoginForm() {
           {isLoading ? "Signing in..." : "Sign in"}
         </Button>
       </form>
-      <Button type="button" className="w-full bg-blue-600 hover:bg-blue-700" disabled={isLoading} onClick={handleSubmit}>
-          {isLoading ? "Accessing..." : "Guest access"}
-      </Button>
     </>
   )
 }

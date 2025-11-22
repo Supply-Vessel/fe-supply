@@ -2,7 +2,7 @@
 
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts"
 import { ChartContainer, ChartTooltipContent } from "@/src/components/ui/chart"
-import type { Request } from "@/src/app/[labId]/dashboard/types"
+import type { Request } from "@/src/app/[vesselId]/dashboard/types"
 import { useMemo } from "react"
 
 const statusMapping = {

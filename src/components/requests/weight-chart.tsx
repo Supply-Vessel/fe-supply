@@ -1,7 +1,7 @@
 "use client"
 
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/src/components/ui/chart"
-import type { AnimalRecord } from "@/src/app/[labId]/requests/[id]/types"
+import type { AnimalRecord } from "@/src/app/[vesselId]/requests/[id]/types"
 import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 
 interface WeightChartProps {

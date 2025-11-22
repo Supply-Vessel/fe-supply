@@ -2,137 +2,37 @@
 
 import type { Request, RequestEnums, RequestPagination } from "@/src/components/requests/types"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
-import type { AnimalPagination } from "@/src/app/[labId]/requests/types"
 import { RequestsList } from "@/src/components/requests/requests-list"
 import { RequestType } from "@/src/components/requests/types"
-import { EditAnimalDialog } from "./edit-animal-dialog"
-import { AddAnimalDialog } from "./add-animal-dialog"
-import { apiClient } from "@/src/lib/apiClient"
-import { useState, useCallback } from "react"
-import { toast } from "sonner"
+import { EditAnimalDialog } from "./edit-request-dialog"
+import { AddAnimalDialog } from "./add-request-dialog"
+import { useState } from "react"
 
 interface RequestsTabsProps {
-  electricalRequestsPagination: RequestPagination
-  engineRequestsPagination: RequestPagination
-  deckRequestsPagination: RequestPagination
-  electricalRequests: Request[]
+  handleUpdateDataPagination: (data: { page?: number; pageSize?: number; defaultType: RequestType }) => Promise<void>;
+  handleSaveRequest: (request: Partial<Request>) => Promise<void>;
+  handleAddRequest: (request: Partial<Request>) => Promise<void>;
+  setElectricPagination: (pagination: RequestPagination) => void;
+  setEnginePagination: (pagination: RequestPagination) => void;
+  setDeckPagination: (pagination: RequestPagination) => void;
+  electricPagination: RequestPagination
+  enginePagination: RequestPagination
+  deckPagination: RequestPagination
   requestEnums: RequestEnums
-  engineRequests: Request[]
-  deckRequests: Request[]
+  electricData: Request[]
+  engineData: Request[]
+  deckData: Request[]
+  vesselId: string
   userId: string
-  labId: string
 }
 
 export function RequestsTabs(props: RequestsTabsProps) {
-  // Состояние для каждой вкладки
-  const {engineRequests, electricalRequests, deckRequests, requestEnums, userId, labId, engineRequestsPagination, electricalRequestsPagination, deckRequestsPagination} = props;
-  const [electricPagination, setElectricPagination] = useState<AnimalPagination>(electricalRequestsPagination)
-  const [enginePagination, setEnginePagination] = useState<AnimalPagination>(engineRequestsPagination)
-  const [deckPagination, setDeckPagination] = useState<AnimalPagination>(deckRequestsPagination)
-  const [electricData, setElectricData] = useState<Request[]>(electricalRequests)
-  const [engineData, setEngineData] = useState<Request[]>(engineRequests)
-  const [deckData, setDeckData] = useState<Request[]>(deckRequests)
+  const {handleUpdateDataPagination, handleSaveRequest, handleAddRequest, setElectricPagination, setEnginePagination, setDeckPagination} = props;
+  const {requestEnums, userId,vesselId, enginePagination, electricPagination, deckPagination, engineData, electricData, deckData} = props;
 
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null)
   const [openEditRequestDialog, setOpenEditRequestDialog] = useState(false)
   const [openAddRequestDialog, setOpenAddRequestDialog] = useState(false)
-
-
-  // Функции для обновления данных каждой вкладки
-  const handleUpdateDataPagination = useCallback(async (data: {page?: number, pageSize?: number, defaultType: RequestType}) => {
-    try {
-      switch (data.defaultType) {
-        case RequestType.ENGINE:
-          const engineResponse = await apiClient.get(
-            `/api/requests/${userId}/${labId}/${data.pageSize || enginePagination.pageSize}/${data.page || enginePagination.currentPage}/${data.defaultType}`
-          )
-          setEnginePagination(engineResponse.pagination)
-          setEngineData(engineResponse.data)
-          break;
-        case RequestType.ELECTRICAL:
-          const electricalResponse = await apiClient.get(
-            `/api/requests/${userId}/${labId}/${data.pageSize || electricPagination.pageSize}/${data.page || electricPagination.currentPage}/${data.defaultType}`
-          )
-          setElectricPagination(electricalResponse.pagination)
-          setElectricData(electricalResponse.data)
-          break;
-        case RequestType.DECK:
-          const deckResponse = await apiClient.get(
-            `/api/requests/${userId}/${labId}/${data.pageSize || deckPagination.pageSize}/${data.page || deckPagination.currentPage}/${data.defaultType}`
-          )
-          setDeckPagination(deckResponse.pagination)
-          setDeckData(deckResponse.data)
-          break;
-        default:
-          break;
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error)
-    }
-  }, [userId, labId, enginePagination, electricPagination, deckPagination]);
-
-  // Функции сохранения и добавления для Engine
-  const handleSaveRequest = async (request: Partial<Request>) => {
-    try {
-      const response = await apiClient.put(`/api/requests`, {
-        ...request,
-        userId,
-        vesselId: labId,
-      })
-      toast(response.message || response.error, {
-        description: `${request.identifier}`
-      })
-      if(response.success && response.data) {
-        let updatedRequests: Request[] = []
-        switch (request.requestType) {
-          case RequestType.ENGINE:
-            updatedRequests = engineData.filter((r) => r.id !== request.id)
-            setEngineData([...updatedRequests, response.data as Request])
-            break;
-          case RequestType.ELECTRICAL:
-            updatedRequests = electricData.filter((r) => r.id !== request.id)
-            setElectricData([...updatedRequests, response.data as Request])
-            break;
-          case RequestType.DECK:
-            updatedRequests = deckData.filter((r) => r.id !== request.id)
-            setDeckData([...updatedRequests, response.data as Request])
-            break;
-        }
-      }
-    } catch (error) {
-      console.error("Error updating engine request:", error)
-      toast.error("Failed to update request")
-    }
-  };
-
-  const handleAddRequest = async (request: Partial<Request>) => {
-    try {
-      const response = await apiClient.post(`/api/requests`, {
-        ...request,
-        userId,
-        vesselId: labId,
-      })
-      toast(response.message || response.error, {
-        description: `${request.identifier}`
-      })
-      if(response.success && response.data) {
-        switch (request.requestType) {
-          case RequestType.ENGINE:
-            setEngineData((prev) => [...prev, response.data as Request])
-            break;
-          case RequestType.ELECTRICAL:
-            setElectricData((prev) => [...prev, response.data as Request])
-            break;
-          case RequestType.DECK:
-            setDeckData((prev) => [...prev, response.data as Request])
-            break;
-        }
-      }
-    } catch (error) {
-      console.error("Error adding engine request:", error)
-      toast.error("Failed to add request")
-    }
-  }
 
   return (
     <Tabs defaultValue="engine" className="w-full">
@@ -208,8 +108,8 @@ export function RequestsTabs(props: RequestsTabsProps) {
           onSubmit={handleSaveRequest}
           open={openEditRequestDialog}
           requestEnums={requestEnums}
+          vesselId={vesselId}
           userId={userId}
-          labId={labId}
       />
     </Tabs>
   )

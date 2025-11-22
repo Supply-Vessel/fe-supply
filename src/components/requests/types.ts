@@ -129,6 +129,8 @@ export interface Request {
   poNumber?: string;
   paymentStatus?: PaymentStatus;
   description?: string;
+  wayBillNumber?: string;
+  storeLocation?: string;
   status: RequestStatus;
   offerNumber?: string;
   companyOfOrder?: string;
@@ -260,4 +262,5 @@ export interface RequestEnums {
   requestType: RequestType[];
   tsiConfirm: TSIConfirm[];
   poStatus: PoStatus[];
+  role: Role[];
 }

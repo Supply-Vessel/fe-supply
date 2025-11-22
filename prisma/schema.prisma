@@ -1,0 +1,469 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Plan {
+  id            String         @id @default(uuid())
+  name          String
+  description   String?
+  price         Float
+  currency      String         @default("CAD")
+  billingCycle  BillingCycle
+  maxUsers      Int
+  features      Json?
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id            String             @id @default(uuid())
+  vesselId      String
+  planId        String
+  startDate     DateTime
+  endDate       DateTime
+  status        SubscriptionStatus
+  maxUsers      Int
+  paymentMethod String?
+  autoRenew     Boolean            @default(true)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  payments      Payment[]
+  vessel        Vessel             @relation(fields: [vesselId], references: [id], onDelete: Cascade)
+  plan          Plan               @relation(fields: [planId], references: [id])
+
+  @@index([vesselId])
+}
+
+model Payment {
+  id             String        @id @default(uuid())
+  subscriptionId String
+  amount         Float
+  currency       String        @default("CAD")
+  paymentDate    DateTime
+  paymentMethod  String
+  transactionId  String?
+  status         PaymentStatus
+  invoiceNumber  String?
+  notes          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  subscription   Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId])
+}
+
+model Vessel {
+  id            String         @id @default(uuid())
+  name          String
+  username      String
+  position      Role           @default(SUPPLIER)
+  description   String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  requests      Request[]
+  experiments   Experiment[]
+  subscriptions Subscription[]
+  users         UserVessel[]
+  invitations   Invitation[]   @relation("VesselInvitations")
+  tasks         Task[]
+}
+
+model User {
+  id             String          @id @default(uuid())
+  email          String          @unique
+  address        String?
+  contactPhone   String?
+  firstName      String?
+  lastName       String?
+  institution    String?
+  password       String
+  confirmedEmail Boolean         @default(false)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  requestRecords RequestRecord[]
+  experiments    Experiment[]
+  notifications  Notification[]
+  tasks          Task[]
+  vessels        UserVessel[]
+  invitations    Invitation[]    @relation("UserInvitations")
+}
+
+model UserVessel {
+  id              String       @id @default(uuid())
+  userId          String
+  vesselId        String
+  role            Role
+  joinedAt        DateTime     @default(now())
+  invitedBy       String?
+  accessStatus    AccessStatus @default(ACTIVE)
+  accessStartDate DateTime     @default(now())
+  accessEndDate   DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  vessel          Vessel       @relation(fields: [vesselId], references: [id], onDelete: Cascade)
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, vesselId])
+}
+
+model Invitation {
+  id        String           @id @default(uuid())
+  email     String
+  code      String
+  vesselId  String
+  invitedBy String
+  role      Role             @default(SUPPLIER)
+  token     String           @unique
+  expiresAt DateTime
+  status    InvitationStatus @default(PENDING)
+  createdAt DateTime         @default(now())
+  usedAt    DateTime?
+  vessel    Vessel           @relation("VesselInvitations", fields: [vesselId], references: [id], onDelete: Cascade)
+  inviter   User             @relation("UserInvitations", fields: [invitedBy], references: [id])
+
+  @@unique([email, vesselId])
+}
+
+model VerificationCode {
+  id        String   @id @default(uuid())
+  email     String
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model CustomField {
+  id           String             @id @default(uuid())
+  name         String
+  fieldType    FieldType
+  isRequired   Boolean            @default(false)
+  defaultValue String?
+  description  String?
+  requestType  RequestType
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  customValues CustomFieldValue[]
+
+  @@unique([name, requestType])
+}
+
+model Request {
+  id             String             @id @default(uuid())
+  tsiConfirm     TSIConfirm?        @default(NOT_CONFIRMED)
+  identifier     String
+  poStatus       PoStatus           @default(WITHOUT_PO)
+  poNumber       String?
+  paymentStatus  PaymentStatus?     @default(CREDIT_NOT_PAID)
+  description    String?
+  wayBillNumber  String?
+  storeLocation  String?
+  status         RequestStatus      @default(WAITING)
+  offerNumber    String?
+  companyOfOrder String?
+  countryOfOrder String?
+  requestType    RequestType        @default(ENGINE)
+  vesselId       String
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  vessel         Vessel             @relation(fields: [vesselId], references: [id])
+  records        RequestRecord[]
+  customFields   CustomFieldValue[]
+
+  @@unique([identifier, vesselId])
+}
+
+model CustomFieldValue {
+  id            String      @id @default(uuid())
+  value         String
+  requestId     String
+  customFieldId String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  request       Request     @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  customField   CustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
+
+  @@unique([requestId, customFieldId])
+}
+
+model RequestRecord {
+  id            String         @id @default(uuid())
+  requestId     String
+  recordType    RecordType
+  date          DateTime       @default(now())
+  createdById   String
+  temperature   Float?
+  weight        Float?
+  feedIntake    Float?
+  waterIntake   Float?
+  activityLevel ActivityLevel?
+  notes         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  request       Request        @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  createdBy     User           @relation(fields: [createdById], references: [id])
+  measurements  Measurement[]
+  photos        RecordPhoto[]
+}
+
+model Measurement {
+  id        String        @id @default(uuid())
+  recordId  String
+  parameter String
+  value     Float
+  unit      String?
+  createdAt DateTime      @default(now())
+  record    RequestRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
+}
+
+model RecordPhoto {
+  id        String        @id @default(uuid())
+  recordId  String
+  imageUrl  String
+  caption   String?
+  createdAt DateTime      @default(now())
+  record    RequestRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
+}
+
+model AnimalPhoto {
+  id        String   @id @default(uuid())
+  requestId String
+  imageUrl  String
+  caption   String?
+  isMain    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Breeding {
+  id         String            @id @default(uuid())
+  motherId   String
+  fatherId   String
+  protocolId String?
+  startDate  DateTime
+  endDate    DateTime?
+  status     BreedingStatus    @default(ACTIVE)
+  notes      String?
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+  protocol   BreedingProtocol? @relation(fields: [protocolId], references: [id])
+}
+
+model BreedingProtocol {
+  id           String      @id @default(uuid())
+  name         String
+  requestType  RequestType
+  description  String?
+  instructions String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  breedings    Breeding[]
+}
+
+model Experiment {
+  id          String             @id @default(uuid())
+  title       String
+  description String?
+  vesselId    String
+  startDate   DateTime
+  endDate     DateTime?
+  status      ExperimentStatus   @default(PLANNED)
+  createdById String
+  protocol    String?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  createdBy   User               @relation(fields: [createdById], references: [id])
+  vessel      Vessel             @relation(fields: [vesselId], references: [id])
+  animals     ExperimentAnimal[]
+  tasks       Task[]
+}
+
+model ExperimentAnimal {
+  id           String     @id @default(uuid())
+  experimentId String
+  requestId    String
+  notes        String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  experiment   Experiment @relation(fields: [experimentId], references: [id], onDelete: Cascade)
+
+  @@unique([experimentId, requestId])
+}
+
+model Task {
+  id           String       @id @default(uuid())
+  title        String
+  description  String?
+  vesselId     String
+  assignedToId String
+  experimentId String?
+  dueDate      DateTime?
+  vessel       Vessel       @relation(fields: [vesselId], references: [id])
+  status       TaskStatus   @default(PENDING)
+  priority     TaskPriority @default(MEDIUM)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  assignedTo   User         @relation(fields: [assignedToId], references: [id])
+  experiment   Experiment?  @relation(fields: [experimentId], references: [id])
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  isRead    Boolean          @default(false)
+  type      NotificationType
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELED
+  TRIAL
+  PENDING
+}
+
+enum TSIConfirm {
+  CONFIRMED_WITH_NOTE
+  NOT_CONFIRMED
+  IN_PROGRESS
+  CONFIRMED
+}
+
+enum PaymentStatus {
+  PREPAYMENT_NOT_PAID
+  PREPAYMENT_PAID
+  CREDIT_NOT_PAID
+  CREDIT_PAID
+}
+
+enum Role {
+  PROCUREMENT_SPECIALIST
+  FINANCIAL_SPECIALIST
+  HEAD_OF_DEPARTMENT
+  SAFETY_SPECIALIST
+  VESSEL_MANAGER
+  TEAM_LEADER
+  SUPPLIER
+  DIRECTOR
+  GUEST
+  TSI
+}
+
+enum AccessStatus {
+  ACTIVE
+  SUSPENDED
+  REVOKED
+  PENDING
+}
+
+enum FieldType {
+  TEXT
+  NUMBER
+  BOOLEAN
+  DATE
+  DROPDOWN
+  MULTISELECT
+}
+
+enum Sex {
+  MALE
+  FEMALE
+  UNKNOWN
+}
+
+enum RequestStatus {
+  WAITING
+  ORDERED
+  RECEIVED
+  ON_HOLD
+  CANCELLED
+}
+
+enum RequestType {
+  ENGINE
+  ELECTRICAL
+  DECK
+}
+
+enum PoStatus {
+  WITHOUT_PO
+  PO_DONE
+}
+
+enum RecordType {
+  ROUTINE_CHECK
+  MEDICATION
+  SAMPLING
+  OBSERVATION
+  TREATMENT
+  EMERGENCY
+}
+
+enum ActivityLevel {
+  VERY_LOW
+  LOW
+  NORMAL
+  HIGH
+  VERY_HIGH
+}
+
+enum BreedingStatus {
+  PLANNED
+  ACTIVE
+  SUCCESSFUL
+  FAILED
+  CANCELED
+}
+
+enum ExperimentStatus {
+  PLANNED
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum NotificationType {
+  SYSTEM
+  TASK
+  EXPERIMENT
+  ANIMAL_ALERT
+  BREEDING
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}
+

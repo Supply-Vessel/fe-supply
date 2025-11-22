@@ -1,7 +1,5 @@
 import Cookies from 'js-cookie';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_LOCAL_DATABASE_URL || process.env.NEXT_PUBLIC_DATABASE_URL;
-
 export class AuthService {
   static TOKEN_KEY = 'auth-token';
   
@@ -29,7 +27,7 @@ export class AuthService {
   static async login(email: string, password: string) {
     try {
       const dataSuccess = {email, password}
-      const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
+      const response = await fetch(`/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -63,7 +61,7 @@ export class AuthService {
     if (!token) return null;
     
     try {
-      const response = await fetch(`${BACKEND_URL}/api/auth/validate`, {
+      const response = await fetch(`/api/auth/validate`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

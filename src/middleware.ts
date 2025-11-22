@@ -1,8 +1,6 @@
 // frontend/middleware.js (в корне проекта Next.js)
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_LOCAL_DATABASE_URL || 'http://localhost:3001';
-
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
@@ -22,8 +20,9 @@ export async function middleware(request: NextRequest) {
   }
   
   try {
-    // Проверяем токен на бекенде
-    const response = await fetch(`${BACKEND_URL}/api/auth/validate`, {
+    // Проверяем токен на бекенде (используем origin текущего запроса)
+    const apiUrl = new URL('/api/auth/validate', request.nextUrl.origin);
+    const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,

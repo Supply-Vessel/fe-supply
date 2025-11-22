@@ -1,45 +1,15 @@
 import type { SetStateAction } from "react"
+import { Role, AccessStatus, ExperimentStatus, RequestStatus } from "@prisma/client"
 
-export enum Role {
-    HEAD_OF_DEPARTMENT = "HEAD_OF_DEPARTMENT",
-    SAFETY_SPECIALIST = "SAFETY_SPECIALIST",
-    VESSEL_MANAGER = "VESSEL_MANAGER",
-    TEAM_LEADER = "TEAM_LEADER",
-    SUPPLIER = "SUPPLIER",
-    DIRECTOR = "DIRECTOR",
-    COUNTER = "COUNTER",
-    GUEST = "GUEST",
-    TSI = "TSI",
-}
-
-export enum AccessStatus {
-    ACTIVE = "ACTIVE",
-    SUSPENDED = "SUSPENDED",
-    REVOKED = "REVOKED",
-    PENDING = "PENDING"
-  }
-
-export enum ExperimentStatus {
-    COMPLETED = "COMPLETED",
-    CANCELLED = "CANCELLED",
-    PLANNED = "PLANNED",
-    ACTIVE = "ACTIVE",
-    PAUSED = "PAUSED",
-}
-
-export enum RequestStatus {
-    WAITING = "WAITING",
-    ORDERED = "ORDERED",
-    RECEIVED = "RECEIVED",
-    ON_HOLD = "ON_HOLD",
-    CANCELLED = "CANCELLED",
-}
+// Re-export Prisma enums for convenience
+export { Role, AccessStatus, ExperimentStatus, RequestStatus }
 
 export enum Sex {
     MALE = "MALE",
     FEMALE = "FEMALE",
     UNKNOWN = "UNKNOWN"
 }
+
 export interface Vessel {
     id: string
     createdAt: Date
@@ -50,7 +20,7 @@ export interface Vessel {
     accessStatus: AccessStatus
     name: string
     username: string
-    position: string
+    position: Role
     description: string | null
     userRole: Role
 }
@@ -85,7 +55,7 @@ export interface LaboratoriesViewProps {
     setSearchTerm: React.Dispatch<SetStateAction<string>>;
     formatDate: (date: Date | string) => string
     filteredLaboratories: Vessel[] | [];
-    handleLabClick: (labId: string) => void;
+    handleLabClick: (vesselId: string) => void;
     handleCreateLab: VoidFunction;
     handleJoinLab: VoidFunction;
     userInfo: UserInfo | null;

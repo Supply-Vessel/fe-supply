@@ -1,5 +1,6 @@
 "use client"
 
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/src/components/ui/input-otp"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
@@ -14,6 +15,7 @@ import { Label } from "@/src/components/ui/label"
 import { useAppDispatch } from "@/src/lib/hooks"
 import { apiClient } from "@/src/lib/apiClient"
 import { AuthService } from "@/src/lib/auth"
+import { Role } from "../account/types"
 import { toast } from "sonner"
 
 const VesselSetupPage = () => {
@@ -171,15 +173,23 @@ const VesselSetupPage = () => {
                                     {/* Position */}
                                     <div className="space-y-2">
                                         <Label htmlFor="position">Position *</Label>
-                                        <Input
-                                        id="position"
-                                        name="position"
-                                        type="text"
-                                        required
-                                        placeholder="Researchers"
-                                        value={vesselData.position}
-                                        onChange={handleLaboratoryInputChange}
-                                        />
+                                        <Select
+                                            value={vesselData.position}
+                                            onValueChange={(value) =>
+                                                setVesselData({ ...vesselData, position: value })
+                                            }
+                                        >
+                                            <SelectTrigger id="position">
+                                                <SelectValue placeholder="Select position" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {Object.values(Role).map((position) => (
+                                                    <SelectItem key={position} value={position}>
+                                                        {position}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                 </div>
 

@@ -1,13 +1,11 @@
 import { AuthService } from "./auth";
 
-const BACKEND_URL =
-process.env.NEXT_PUBLIC_LOCAL_DATABASE_URL as string || process.env.NEXT_PUBLIC_DATABASE_URL as string;
-
 class ApiClient {
-  baseURL: string; // Объявите свойство baseURL
+
+  baseUrl: string;
 
   constructor() {
-    this.baseURL = BACKEND_URL;
+    this.baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
   }
 
   async request(endpoint: string, options: RequestInit = {}) {
@@ -24,7 +22,7 @@ class ApiClient {
     };
 
     try {
-      const response = await fetch(`${this.baseURL}${endpoint}`, config);
+      const response = await fetch(`${this.baseUrl}${endpoint}`, config);
 
       if (response.status === 401) {
         AuthService.logout();

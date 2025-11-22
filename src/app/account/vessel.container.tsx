@@ -54,8 +54,8 @@ export default function VesselsContainer({ userVessels }: VesselsContainerProps)
         return `${firstName.charAt(0)}${lastName.charAt(0)}`
     }, []);
 
-    const handleLabClick = useCallback((labId: string) => {
-        router.push(`/${labId}/dashboard`)
+    const handleLabClick = useCallback((vesselId: string) => {
+        router.push(`/${vesselId}/dashboard`)
     }, [userInfo, router]);
     
     const handleJoinLab = useCallback(() => {

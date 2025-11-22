@@ -1,16 +1,12 @@
-import type { Experiment, Request, Task } from "@/src/app/[labId]/dashboard/types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
-import { Beaker, MousePointer, ClipboardList, AlertTriangle } from "lucide-react"
+import type { Request } from "@/src/app/[vesselId]/dashboard/types"
+import { MousePointer } from "lucide-react"
 import { useMemo } from "react"
 
 interface DashboardStatusProps {
-  experiments: Experiment[];
   requests: Request[];
-  tasks: Task[];
   previousMonthData?: {
-    experiments: number;
     requests: number;
-    tasks: number;
   };
 }
 
@@ -104,18 +100,10 @@ function formatPercentageText(current: number, previous: number, type: 'requests
   };
 }
 
-export function DashboardStatus({requests, experiments, tasks, previousMonthData}: DashboardStatusProps) {
+export function DashboardStatus({requests, previousMonthData}: DashboardStatusProps) {
   const requestsChange = useMemo(() => previousMonthData ?
     formatPercentageText(requests.length, previousMonthData.requests, 'requests') : 
     { text: "No previous data", className: "text-xs text-gray-500" }, [requests, previousMonthData]);
-
-  const experimentsChange = useMemo(() => previousMonthData ? 
-    formatPercentageText(experiments.length, previousMonthData.experiments, 'experiments') : 
-    { text: "No previous data", className: "text-xs text-gray-500" }, [experiments, previousMonthData]);
-
-  const tasksChange = useMemo(() => previousMonthData ? 
-    formatPercentageText(tasks.length, previousMonthData.tasks, 'tasks') : 
-    { text: "No previous data", className: "text-xs text-gray-500" }, [tasks, previousMonthData]);
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 w-[315px] md:w-full">
@@ -127,36 +115,6 @@ export function DashboardStatus({requests, experiments, tasks, previousMonthData
         <CardContent>
           <div className="text-2xl font-bold">{requests.length}</div>
           <p className={requestsChange.className}>{requestsChange.text}</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Active Requests</CardTitle>
-          <Beaker className="h-4 w-4 text-purple-600" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{experiments.length}</div>
-          <p className={experimentsChange.className}>{experimentsChange.text}</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Pending Requests</CardTitle>
-          <ClipboardList className="h-4 w-4 text-yellow-600" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{tasks.length}</div>
-          <p className={tasksChange.className}>{tasksChange.text}</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Critical Alerts</CardTitle>
-          <AlertTriangle className="h-4 w-4 text-red-600" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">3</div>
-          <p className="text-xs text-gray-500">Requires immediate attention</p>
         </CardContent>
       </Card>
     </div>
