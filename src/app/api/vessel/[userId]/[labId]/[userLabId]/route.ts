@@ -13,7 +13,7 @@ type RouteParams = {
 // DELETE /api/vessel/:userId/:vesselId/:userVesselId - удалить участника vessel
 export async function DELETE(req: NextRequest, { params }: RouteParams) {
     try {
-        const { userId: ownerUserId,vesselId, userVesselId } = params;
+        const { userId: ownerUserId,vesselId, userVesselId } = await params;
 
         // Проверяем, что пользователь, который пытается удалить, является владельцем лаборатории
         const ownerVessel = await prismaClient.userVessel.findFirst({

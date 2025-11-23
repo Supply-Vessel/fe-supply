@@ -15,7 +15,7 @@ type RouteParams = {
 // GET /api/requests/:userId/:vesselId/:rows/:page/:requestType - получить requests с фильтром по типу
 export async function GET(req: NextRequest, { params }: RouteParams) {
     try {
-        const { userId,vesselId, rows, page, requestType } = params;
+        const { userId,vesselId, rows, page, requestType } = await params;
         const rowsNumber = parseInt(rows);
         const pageNumber = parseInt(page);
         

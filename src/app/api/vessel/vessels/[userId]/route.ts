@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AccessStatus } from '@prisma/client';
 import { prismaClient } from '@/src/lib/server/prisma';
+import { AccessStatus } from '@prisma/client';
 
 type RouteParams = {
     params: {
@@ -10,7 +10,7 @@ type RouteParams = {
 
 export async function GET(req: NextRequest, { params }: RouteParams) {
     try {
-        const { userId } = params;
+        const { userId } = await params;
 
         const userVessels = await prismaClient.userVessel.findMany({
             where: {
