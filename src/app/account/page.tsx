@@ -7,7 +7,7 @@ import { cookies } from 'next/headers';
 export default async function Page() {
     const cookieStore = await cookies();
     const userId = await cookieStore.get('USER_ID')?.value || 'default';
-    const vessels = await apiClient.get(`/api/vessel/vessels/${userId}`);
+    const vessels = await apiClient.get(`https://shiphub-ten.vercel.app/api/vessel/vessels/${userId}`);
     return (
         <VesselsContainer
             userVessels={vessels.data}
