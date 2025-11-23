@@ -8,7 +8,8 @@ export class AuthService {
     Cookies.set(this.TOKEN_KEY, token, {
       expires: 1, // 1 day
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict'
+      sameSite: 'lax', // Changed from 'strict' to 'lax' for better compatibility
+      path: '/'
     });
   }
   

@@ -1,6 +1,5 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -19,30 +18,37 @@ export async function middleware(request: NextRequest) {
   }
   
   try {
-    const secret = process.env.NEXT_PUBLIC_KEY?.replace(/\\n/g, '\n');
+    // Validate token via internal API route (use absolute URL for Vercel)
+    const protocol = request.nextUrl.protocol;
+    const host = request.headers.get('host');
+    const apiUrl = `${protocol}//${host}/api/auth/validate`;
     
-    if (!secret) {
-      console.error('NEXT_PUBLIC_KEY is not configured');
-      return NextResponse.redirect(new URL('/signin', request.url));
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Token validation failed');
     }
     
-    const decoded = jwt.verify(token, secret, { algorithms: ['RS256'] });
+    const data = await response.json();
     
-    if (typeof decoded === 'object' && decoded !== null) {
-      const requestHeaders = new Headers(request.headers);
-      requestHeaders.set('x-user-id', (decoded as any).userId || '');
-      requestHeaders.set('x-user-email', (decoded as any).email || '');
-      requestHeaders.set('x-user-confirmed-email', (decoded as any).confirmedEmail || '');
-      requestHeaders.set('x-user-created-at', (decoded as any).createdAt || '');
-      
-      return NextResponse.next({
-        request: {
-          headers: requestHeaders,
-        },
-      });
-    }
+    // Add user information to headers for use in pages
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-user-id', data.user.userId);
+    requestHeaders.set('x-user-email', data.user.email);
+    requestHeaders.set('x-user-confirmed-email', data.user.confirmedEmail);
+    requestHeaders.set('x-user-created-at', data.user.createdAt);
     
-    throw new Error('Invalid token structure');
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
     
   } catch (error) {
     console.error('Token validation error:', error);
