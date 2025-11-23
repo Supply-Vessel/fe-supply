@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
         }, { status: 401 });
     }
 
-    const secret = process.env.NEXT_PUBLIC_KEY;
+    const secret = process.env.NEXT_PUBLIC_KEY?.replace(/\\n/g, '\n');
     if (!secret || typeof secret !== 'string' || secret.trim() === '') {
         return NextResponse.json({
             success: false,
