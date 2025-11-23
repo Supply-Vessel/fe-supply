@@ -12,7 +12,7 @@ type RouteParams = {
 // GET /api/requests/types/:userId/:vesselId - получить типы requests
 export async function GET(req: NextRequest, { params }: RouteParams) {
     try {
-        const {vesselId, userId } = params;
+        const {vesselId, userId } = await params;
 
         // Check if user has access to this laboratory (vesselId is laboratory name)
         const userVessel = await prismaClient.userVessel.findFirst({
