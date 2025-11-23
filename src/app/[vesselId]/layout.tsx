@@ -19,11 +19,11 @@ export default async function DashboardLayout({
   const {vesselId} = await params;
   const cookieStore = await cookies();
   const userId = await cookieStore.get('USER_ID')?.value || 'default';
-  const laboratories = await apiClient.get(`/api/vessel/vessels/${userId}`);
-  const laboratory = await laboratories.data.find((laboratory: Vessel) => laboratory.name ===vesselId);
-  const laboratoryMembers = await apiClient.get(`/api/vessel/${userId}/${vesselId}`);
+  const vessels = await apiClient.get(`https://shiphub-ten.vercel.app/api/vessel/vessels/${userId}`);
+  const vessel = await vessels.data.find((vessel: Vessel) => vessel.name ===vesselId);
+  const vesselMembers = await apiClient.get(`https://shiphub-ten.vercel.app/api/vessel/${userId}/${vesselId}`);
 
-  if(!laboratory) {
+  if(!vessel) {
     redirect('/account');
   }
   
@@ -32,7 +32,7 @@ export default async function DashboardLayout({
       <div className="flex min-h-screen bg-gray-50">
         <Sidebar />
         <div className="flex flex-1 flex-col">
-          <DashboardHeader laboratoryMembers={laboratoryMembers.data} />
+          <DashboardHeader vesselMembers={vesselMembers.data} />
           <main className="flex-1 p-6">{children}</main>
         </div>
       </div>

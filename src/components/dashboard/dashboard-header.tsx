@@ -2,13 +2,13 @@
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/src/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar"
-import type { InitialMembersTypes } from "@/src/app/[vesselId]/team/types"
+import type { VesselMembersTypes } from "@/src/app/[vesselId]/team/types"
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Badge } from "@/src/components/ui/badge"
 import { Bell, Search } from "lucide-react"
 
-export function DashboardHeader({laboratoryMembers}: {laboratoryMembers: InitialMembersTypes[]}) {
+export function DashboardHeader({vesselMembers}: {vesselMembers: VesselMembersTypes[]}) {
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 md:px-6">
       <div className="flex flex-1 items-center gap-4 md:gap-8">
@@ -25,7 +25,7 @@ export function DashboardHeader({laboratoryMembers}: {laboratoryMembers: Initial
       </div>
       <div className="flex items-center gap-4">
         <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
-          {laboratoryMembers.map((member) => {
+          {vesselMembers.map((member) => {
             return (
               <DropdownMenu key={member.id}>
                 <DropdownMenuTrigger asChild>

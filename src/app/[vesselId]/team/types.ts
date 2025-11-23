@@ -1,10 +1,10 @@
-import type { AccessStatus, AnimalStatus, Role, Sex } from "../../account/types";
+import type { AccessStatus, Role, Sex } from "../../account/types";
 import type { ActivityLevel, RecordType } from "../requests/types";
 
-export interface InitialMembersTypes {
+export interface VesselMembersTypes {
     id: string;
     userId: string;
-    laboratoryId: string;
+    vesselId: string;
     role: Role;
     joinedAt: string;
     invitedBy: string | null;
@@ -32,17 +32,16 @@ export interface NewMemberTypes {
     role: string;
 }
 
-export interface LaboratoryMembersResponse {
+export interface VesselMembersResponse {
     success: boolean;
-    data: InitialMembersTypes[];
+    data: VesselMembersTypes[];
     message: string;
 }
 
-export interface AnimalEnums {
+export interface RequestEnums {
     activityLevel: ActivityLevel[];
     accessStatus: AccessStatus[]
     recordType: RecordType[];
-    status: AnimalStatus[];
     role: Role[];
     sex: Sex[];
 }

@@ -43,26 +43,7 @@ export default function DashboardView({requests, previousMonthData}: DashboardVi
             <StatusStatisticsChart requests={requests} />
           </CardContent>
         </Card>
-        {/* <Card className="lg:col-span-4 w-[315px] md:w-full">
-          <CardHeader>
-            <CardTitle>Upcoming Events</CardTitle>
-            <CardDescription>Scheduled events for the next 7 days</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <UpcomingEvents />
-          </CardContent>
-        </Card>
-        <Card className="lg:col-span-3 w-[315px] md:w-full">
-          <CardHeader>
-            <CardTitle>Notifications</CardTitle>
-            <CardDescription>Recent alerts and notifications</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <NotificationPanel />
-          </CardContent>
-        </Card> */}
       </div>
-      {/* <SubscriptionStatus /> */}
     </div>
   )
 }
