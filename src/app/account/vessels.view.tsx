@@ -1,3 +1,5 @@
+"use client"
+
 import { Building2, Plus, Users, Calendar, MapPin, Mail, User, ChevronRight, Search, BriefcaseBusiness } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Avatar, AvatarFallback } from "@/src/components/ui/avatar"
