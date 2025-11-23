@@ -1,17 +1,16 @@
-// frontend/middleware.js (в корне проекта Next.js)
+
 import { NextRequest, NextResponse } from 'next/server';
+import jwt from 'jsonwebtoken';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  
-  // Публичные страницы, которые не требуют авторизации
+  // Public pages that don't require authentication
   const publicPaths = ['/signin', '/signup', '/forgot-password', '/'];
   
   if (publicPaths.includes(pathname)) {
     return NextResponse.next();
   }
   
-  // Получаем токен из cookies или headers
   const token = request.cookies.get('auth-token')?.value ||
                 request.headers.get('authorization')?.replace('Bearer ', '');
   
@@ -20,35 +19,30 @@ export async function middleware(request: NextRequest) {
   }
   
   try {
-    // Проверяем токен на бекенде (используем origin текущего запроса)
-    const apiUrl = new URL('/api/auth/validate', request.nextUrl.origin);
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
+    const secret = process.env.NEXT_PUBLIC_KEY?.replace(/\\n/g, '\n');
     
-    if (!response.ok) {
-      throw new Error('Token validation failed');
+    if (!secret) {
+      console.error('NEXT_PUBLIC_KEY is not configured');
+      return NextResponse.redirect(new URL('/signin', request.url));
     }
     
-    const data = await response.json();
+    const decoded = jwt.verify(token, secret, { algorithms: ['RS256'] });
     
-    // Добавляем информацию о пользователе в headers для использования в страницах
-    const requestHeaders = new Headers(request.headers);
-    requestHeaders.set('x-user-id', data.user.userId);
-    requestHeaders.set('x-user-email', data.user.email);
-    requestHeaders.set('x-user-role', data.user.role);
-    requestHeaders.set('x-user-confirmed-email', data.user.confirmedEmail);
-    requestHeaders.set('x-user-created-at', data.user.createdAt);
+    if (typeof decoded === 'object' && decoded !== null) {
+      const requestHeaders = new Headers(request.headers);
+      requestHeaders.set('x-user-id', (decoded as any).userId || '');
+      requestHeaders.set('x-user-email', (decoded as any).email || '');
+      requestHeaders.set('x-user-confirmed-email', (decoded as any).confirmedEmail || '');
+      requestHeaders.set('x-user-created-at', (decoded as any).createdAt || '');
+      
+      return NextResponse.next({
+        request: {
+          headers: requestHeaders,
+        },
+      });
+    }
     
-    return NextResponse.next({
-      request: {
-        headers: requestHeaders,
-      },
-    });
+    throw new Error('Invalid token structure');
     
   } catch (error) {
     console.error('Token validation error:', error);
@@ -59,10 +53,10 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Применяем middleware ко всем путям кроме:
+     * Apply middleware to all paths except:
      * - api routes
-     * - _next/static (статические файлы)
-     * - _next/image (оптимизация изображений)
+     * - _next/static (static files)
+     * - _next/image (image optimization)
      * - favicon.ico
      */
     '/((?!api|_next/static|_next/image|favicon.ico).*)',

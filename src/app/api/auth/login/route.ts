@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
             },
         }, { status: 200 });
     } catch (error) {
-        console.error('An error occurred. Please try again later:', error);
+        console.error('Login error details:', error);
         return NextResponse.json({
             success: false,
             error: 'An error occurred. Please try again later',
