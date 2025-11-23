@@ -14,10 +14,10 @@ export default async function RequestsPage({params}: PageProps) {
   const rows = 10;
   const page = 1;
 
-  const electricalRequests = await apiClient.get(`/api/requests/${userId}/${vesselId}/${rows}/${page}/${RequestType.ELECTRICAL}`);
-  const engineRequests = await apiClient.get(`/api/requests/${userId}/${vesselId}/${rows}/${page}/${RequestType.ENGINE}`);
-  const deckRequests = await apiClient.get(`/api/requests/${userId}/${vesselId}/${rows}/${page}/${RequestType.DECK}`);
-  const requestEnums = await apiClient.get(`/api/requests/enums`);
+  const electricalRequests = await apiClient.get(`https://shiphub-ten.vercel.app/api/requests/${userId}/${vesselId}/${rows}/${page}/${RequestType.ELECTRICAL}`);
+  const engineRequests = await apiClient.get(`https://shiphub-ten.vercel.app/api/requests/${userId}/${vesselId}/${rows}/${page}/${RequestType.ENGINE}`);
+  const deckRequests = await apiClient.get(`https://shiphub-ten.vercel.app/api/requests/${userId}/${vesselId}/${rows}/${page}/${RequestType.DECK}`);
+  const requestEnums = await apiClient.get(`https://shiphub-ten.vercel.app/api/requests/enums`);
 
   return (
     <RequestsContainer
@@ -28,8 +28,8 @@ export default async function RequestsPage({params}: PageProps) {
       engineRequests={engineRequests.data}
       deckRequests={deckRequests.data}
       requestEnums={requestEnums.data}
+      vesselId={vesselId}
       userId={userId}
-     vesselId={vesselId} 
     />
   )
 }

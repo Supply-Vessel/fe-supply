@@ -10,7 +10,7 @@ export default async function Page ({params}: PageProps) {
   const cookieStore = await cookies();
   const userId = await cookieStore.get('USER_ID')?.value || 'default';
 
-  const requests = await apiClient.get(`/api/requests/${userId}/${vesselId}/999999/1`);
+  const requests = await apiClient.get(`https://shiphub-ten.vercel.app/api/requests/${userId}/${vesselId}/999999/1`);
   return (
     <DashboardContainer
       requests={requests.data}
