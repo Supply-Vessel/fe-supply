@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
             }, { status: 401 });
         }
 
-        const secret = process.env.RSA_PRIVATE_KEY;
+        const secret = process.env.RSA_PRIVATE_KEY?.replace(/\\n/g, '\n');
         if (!secret || typeof secret !== 'string' || secret.trim() === '') {
             throw new Error('PRIVATE_KEY is not configured or invalid');
         }
