@@ -1,37 +1,22 @@
 "use client"
 
-import AnimalDetailPage from "./animal.record.view";
-import type { AnimalPagination } from "../../types";
-import { apiClient } from "@/src/lib/apiClient";
-import { useCallback, useState } from "react";
-import type { Animal } from "./types";
+import WaybillRecordView from "./waybill.record.view";
+import { useState } from "react";
 
 export interface RecordContainerProps {
     userId: string;
-    labId: string;
-    animalId: string;
-    animal: Animal;
-    animalPagination: AnimalPagination;
+    wayBillId: string;
+    logistics: any;
 }
 
-export default function RecordContainer({userId, labId, animalId, animal, animalPagination}: RecordContainerProps) {
-    const [pagination, setPagination] = useState<AnimalPagination>(animalPagination);
-    const [animalData, setAnimalData] = useState(animal);
-
-    const handleUpdateDataPagination = useCallback(async (data: {page?: number, pageSize?: number}) => {
-        const response = await apiClient.get(`/api/animals/animal/${userId}/${labId}/${animalId}/${data.pageSize || pagination.pageSize}/${data.page || pagination.currentPage}`)
-        setPagination(response.pagination)
-        setAnimalData(response.data)
-    }, [userId, labId, pagination])
+export default function RecordContainer({userId, wayBillId, logistics}: RecordContainerProps) {
+    const [logisticsData, setLogisticsData] = useState(logistics);
 
     return (
-        <AnimalDetailPage
-            handleUpdateDataPagination={handleUpdateDataPagination}
-            pagination={pagination}
-            animalId={animalId}
-            animal={animalData}
+        <WaybillRecordView
+            logistics={logisticsData}
+            wayBillId={wayBillId}
             userId={userId}
-            labId={labId}
         />
     )
 }
