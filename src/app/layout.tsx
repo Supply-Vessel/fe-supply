@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next"
 import CustomLayout from "./customLayout"
 import { Inter } from "next/font/google"
 import type { Metadata } from "next"
@@ -34,6 +35,7 @@ export default function RootLayout({
         <CustomLayout>
           {children}
         </CustomLayout>
+        <Analytics />
       </body>
     </html>
   )
