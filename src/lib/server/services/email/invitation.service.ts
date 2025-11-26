@@ -3,8 +3,8 @@ import { Resend } from 'resend';
 const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
 export default async function sendInvitationCode(email: string, code: string,vesselId: string, role: string) {
-    const signupUrl = 'https://shiphub-ten.vercel.app/signup';
-    const joinLabUrl = 'https://shiphub-ten.vercel.app/laboratory-setup?tab=join';
+    const signupUrl = '${process.env.NEXT_PUBLIC_ABSOLUTE_URL}/signup';
+    const joinLabUrl = '${process.env.NEXT_PUBLIC_ABSOLUTE_URL}/laboratory-setup?tab=join';
 
     await resend.emails.send({
         from: 'onboarding@resend.dev',
@@ -13,7 +13,7 @@ export default async function sendInvitationCode(email: string, code: string,ves
         html: `
             <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
                 <div style="text-align: center; margin-bottom: 30px;">
-                    <img src="https://shiphub-ten.vercel.app/favicon.ico" alt="Ship Hub Logo" width="120" />
+                    <img src="${process.env.NEXT_PUBLIC_ABSOLUTE_URL}/favicon.ico" alt="Ship Hub Logo" width="120" />
                 </div>
                 <h2 style="text-align: center; color: #2d3748;">Welcome to Ship Hub</h2>
                 <p style="text-align: center;">You have been invited to join vessel: <strong>${vesselId}</strong></p>

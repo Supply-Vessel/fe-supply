@@ -5,13 +5,13 @@ import { Request, RequestStatus, RequestType, PoStatus, TSIConfirm, PaymentStatu
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
 import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/popover"
-import { LayoutGrid, LayoutList, Check, X, Plus } from "lucide-react"
+import { LayoutGrid, LayoutList, Check, X, Plus, Link2 } from "lucide-react"
 import { Checkbox } from "@/src/components/ui/checkbox"
+import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
 import { Input } from "@/src/components/ui/input"
 import { Card } from "@/src/components/ui/card"
-import { useParams } from "next/navigation"
 import { useState, useMemo } from "react"
 import { toast } from "sonner"
 
@@ -76,6 +76,7 @@ export function RequestsList({requests, requestPagination, setPagination, handle
   })
   const [showColumnSelect, setShowColumnSelect] = useState(false)
 
+  const router = useRouter();
   const params = useParams();
   const {vesselId } = params;
   
@@ -774,7 +775,21 @@ export function RequestsList({requests, requestPagination, setPagination, handle
                     {columnVisibility.companyOfOrder && <TableCell>{renderEditableCell(request, "companyOfOrder", isEditing)}</TableCell>}
                     {columnVisibility.countryOfOrder && <TableCell>{renderEditableCell(request, "countryOfOrder", isEditing)}</TableCell>}
                     {columnVisibility.storeLocation && <TableCell>{renderEditableCell(request, "storeLocation", isEditing)}</TableCell>}
-                    {columnVisibility.wayBillNumber && <TableCell>{renderEditableCell(request, "wayBillNumber", isEditing)}</TableCell>}
+                    {columnVisibility.wayBillNumber && (
+                      <TableCell>
+                        {request.wayBillNumber && (
+                          <Badge
+                            variant="outline"
+                            className="bg-blue-100 text-blue-800 hover:bg-blue-200 flex gap-1 justify-center w-32 flex-nowrap whitespace-nowrap"
+                            onClick={() => {
+                              router.push(`/${vesselId}/requests/waybill/${request.wayBillNumber}`)
+                            }}>
+                            {request.wayBillNumber}
+                            <Link2 className="h-4 w-4" />
+                          </Badge>
+                        )}
+                      </TableCell>
+                    )}
                     <TableCell>
                       {isEditing ? (
                         <div className="flex items-center gap-1">

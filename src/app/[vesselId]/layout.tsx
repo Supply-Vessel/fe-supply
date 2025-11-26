@@ -19,9 +19,9 @@ export default async function DashboardLayout({
   const {vesselId} = await params;
   const cookieStore = await cookies();
   const userId = await cookieStore.get('USER_ID')?.value || 'default';
-  const vessels = await apiClient.get(`https://shiphub-ten.vercel.app/api/vessel/vessels/${userId}`);
+  const vessels = await apiClient.get(`${process.env.NEXT_PUBLIC_ABSOLUTE_URL}/api/vessel/vessels/${userId}`);
   const vessel = await vessels.data.find((vessel: Vessel) => vessel.name ===vesselId);
-  const vesselMembers = await apiClient.get(`https://shiphub-ten.vercel.app/api/vessel/${userId}/${vesselId}`);
+  const vesselMembers = await apiClient.get(`${process.env.NEXT_PUBLIC_ABSOLUTE_URL}/api/vessel/${userId}/${vesselId}`);
 
   if(!vessel) {
     redirect('/account');

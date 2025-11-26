@@ -9,7 +9,7 @@ const colors = [
   { label: "Deck", color: "#00FFFF" },
 ] as const
 
-function processAnimalData(requests: Request[]): { chartData: any[], requestTypes: string[] } {
+function processRequestData(requests: Request[]): { chartData: any[], requestTypes: string[] } {
   if (!requests || requests.length === 0) {
     return { chartData: [], requestTypes: [] }
   }
@@ -70,8 +70,8 @@ function processAnimalData(requests: Request[]): { chartData: any[], requestType
   return { chartData, requestTypes: allRequestTypes }
 }
 
-export function AnimalPopulationChart({requests}: {requests: Request[]}) {
-  const { chartData, requestTypes } = useMemo(() => processAnimalData(requests), [requests])
+export function RequestPopulationChart({requests}: {requests: Request[]}) {
+  const { chartData, requestTypes } = useMemo(() => processRequestData(requests), [requests])
 
   if (!chartData || chartData.length === 0) {
     return (

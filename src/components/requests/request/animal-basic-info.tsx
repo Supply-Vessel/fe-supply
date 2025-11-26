@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/ca
 import { differenceInYears, differenceInMonths, differenceInDays } from 'date-fns';
 import { MapPin, Thermometer, Weight } from "lucide-react"
 import type React from "react"
-import type { Animal } from "@/src/app/[vesselId]/requests/[id]/types"
+import type { Animal } from "@/src/app/[vesselId]/requests/waybill/[id]/types"
 
 export function AnimalBasicInfo({ animal }: { animal: Animal }) {
   const birthDate = new Date(animal.birthDate || "");

@@ -3,7 +3,7 @@
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/src/components/ui/pagination"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
-import type { Animal, AnimalRecordMeasurement } from "@/src/app/[vesselId]/requests/[id]/types"
+import type { Animal, AnimalRecordMeasurement } from "@/src/app/[vesselId]/requests/waybill/[id]/types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
 import type { AnimalPagination } from "@/src/app/[vesselId]/requests/types"
 import { TemperatureChart } from "@/src/components/requests/temperature-chart"

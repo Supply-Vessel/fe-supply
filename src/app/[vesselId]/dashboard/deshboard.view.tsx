@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
-import { AnimalPopulationChart } from "@/src/components/dashboard/animal-population-chart"
+import { RequestPopulationChart } from "@/src/components/dashboard/request-population-chart"
 import { StatusStatisticsChart } from "@/src/components/dashboard/status-statistics-chart"
 import { SubscriptionStatus } from "@/src/components/dashboard/subscription-status"
 import { NotificationPanel } from "@/src/components/dashboard/notification-panel"
@@ -31,7 +31,7 @@ export default function DashboardView({requests, previousMonthData}: DashboardVi
             <CardDescription>Request changes over the last 30 days</CardDescription>
           </CardHeader>
           <CardContent>
-            <AnimalPopulationChart requests={requests} />
+            <RequestPopulationChart requests={requests} />
           </CardContent>
         </Card>
         <Card className="lg:col-span-3 w-[315px] md:w-full">

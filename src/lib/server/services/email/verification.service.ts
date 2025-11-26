@@ -10,7 +10,7 @@ export default async function sendVarificationCode(email: string, code: string) 
         html: `
             <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
                 <div style="text-align: center; margin-bottom: 30px;">
-                    <img src="https://shiphub-ten.vercel.app/favicon.ico" alt="Ship Hub Logo" width="120" />
+                    <img src="${process.env.NEXT_PUBLIC_ABSOLUTE_URL}/favicon.ico" alt="Ship Hub Logo" width="120" />
                 </div>
                 <h2 style="text-align: center; color: #2d3748;">Welcome to Ship Hub</h2>
                 <p style="text-align: center;">Your 6-digit verification code is:</p>
