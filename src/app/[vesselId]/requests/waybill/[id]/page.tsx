@@ -403,10 +403,11 @@ const mockData = {
 }
 
 export default async function RecordPage({params}: PageProps) {
+	const apiKey = process.env.SEARATES_API_KEY;
     const {wayBillId} = await params;
     const cookieStore = await cookies();
     const userId = await cookieStore.get('USER_ID')?.value || 'default';
-    const logistics = await apiClient.get(`https://tracking.searates.com/air?api_key=${process.env.NEXT_PUBLIC_SEARATES_API_KEY}&number=${wayBillId as string}`);
+    const logistics = await apiClient.get(`https://tracking.searates.com/air?api_key=${apiKey}&number=${wayBillId as string}`);
     
     return (
         <RecordContainer
