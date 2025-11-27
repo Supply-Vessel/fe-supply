@@ -35,7 +35,7 @@ export function WaybillMeasurements({ logistics }: WaybillMeasurementsProps) {
             <CardTitle>Total weight</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{logistics?.data?.weight || 0} кг</div>
+            <div className="text-3xl font-bold">{logistics?.data?.weight || 0} kg</div>
             <p className="text-sm text-gray-500 mt-2">Total weight of all cargo</p>
           </CardContent>
         </Card>

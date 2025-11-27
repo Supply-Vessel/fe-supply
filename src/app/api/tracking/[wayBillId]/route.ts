@@ -8,9 +8,8 @@ type RouteParams = {
 
 export async function GET(req: NextRequest, { params }: RouteParams) {
     try {
-        const { wayBillId } = await params;
-    
-    const apiKey = process.env.SEARATES_API_KEY;
+      const { wayBillId } = await params;
+      const apiKey = process.env.SEARATES_API_KEY;
     if (!apiKey) {
       return NextResponse.json({ error: 'SEARATES_API_KEY is not configured' }, { status: 500 });
     }
