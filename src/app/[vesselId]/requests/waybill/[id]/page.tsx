@@ -406,10 +406,9 @@ export default async function RecordPage({params}: PageProps) {
     const {wayBillId} = await params;
     const cookieStore = await cookies();
     const userId = await cookieStore.get('USER_ID')?.value || 'default';
-    const logistics = await fetch(`/api/tracking?wayBillId=${wayBillId}`, {
-		method: 'GET',
-	  });
-    
+    const logistics = await apiClient.get(`/api/tracking/${wayBillId}`);
+    console.log("logistics", logistics);
+	
     return (
         <RecordContainer
             wayBillId={wayBillId}

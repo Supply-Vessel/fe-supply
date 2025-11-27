@@ -4,8 +4,8 @@ import { AccessStatus } from '@prisma/client';
 
 type RouteParams = {
     params: {
+        vesselId: string;
         userId: string;
-       vesselId: string;
         rows: string;
         page: string;
     };
@@ -14,7 +14,7 @@ type RouteParams = {
 // GET /api/requests/:userId/:vesselId/:rows/:page - получить все requests (без фильтра по типу)
 export async function GET(req: NextRequest, { params }: RouteParams) {
     try {
-        const { userId,vesselId, rows, page } = await params;
+        const { userId, vesselId, rows, page } = await params;
         const rowsNumber = parseInt(rows);
         const pageNumber = parseInt(page);
         
