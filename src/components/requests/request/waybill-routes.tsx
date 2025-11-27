@@ -5,11 +5,11 @@ import { Download, Filter, MapPin, Package, Plane, Search } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
 import { Input } from "@/src/components/ui/input"
 
-interface WaybillExperimentsProps {
+interface WaybillRoutesProps {
   logistics: any
 }
 
-export function WaybillExperiments({ logistics }: WaybillExperimentsProps) {
+export function WaybillRoutes({ logistics }: WaybillRoutesProps) {
   const routes = logistics?.data?.routes || []
 
   return (

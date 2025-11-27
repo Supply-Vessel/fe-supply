@@ -7,20 +7,22 @@ import { cookies } from "next/headers";
 export interface PageProps {
     params: {
         wayBillId: string;
+        vesselId: string;
     }
 }
 
 export default async function RecordPage({params}: PageProps) {
-    const {wayBillId} = await params;
+    const {wayBillId, vesselId} = await params;
     const cookieStore = await cookies();
     const userId = await cookieStore.get('USER_ID')?.value || 'default';
     const logistics = await apiClient.get(`${process.env.NEXT_PUBLIC_ABSOLUTE_URL}/api/tracking/${wayBillId}`);
 	
     return (
         <RecordContainer
-            wayBillId={wayBillId}
-            logistics={logistics}
-            userId={userId}
+			wayBillId={wayBillId}
+			logistics={logistics}
+			vesselId={vesselId}
+			userId={userId}
         />
     )
 }

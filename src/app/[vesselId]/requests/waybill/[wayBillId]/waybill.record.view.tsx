@@ -1,34 +1,48 @@
 "use client"
 
-import { WaybillMeasurements } from "@/src/components/requests/request/waybill-measurements"
-import { WaybillExperiments } from "@/src/components/requests/request/waybill-experiments"
+import { WaybillStatistics } from "@/src/components/requests/request/waybill-statistics"
 import { WaybillBasicInfo } from "@/src/components/requests/request/waybill-basic-info"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
-import { WaybillRecords } from "@/src/components/requests/request/waybill-records"
+import { WaybillEvents } from "@/src/components/requests/request/waybill-events"
 import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar"
-import { Calendar, Clock, Edit, MapPin, Plus } from "lucide-react"
+import { WaybillRoutes } from "@/src/components/requests/request/waybill-routes"
+import { ArrowLeft, Calendar, Clock, MapPin } from "lucide-react"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 export interface WaybillRecordViewProps {
     wayBillId: string;
+    vesselId: string;
     userId: string;
     logistics: any;
 }
 
-export default function WaybillRecordView({userId, wayBillId, logistics}: WaybillRecordViewProps) {
+export default function WaybillRecordView({userId, wayBillId, logistics, vesselId}: WaybillRecordViewProps) {
   const router = useRouter();
   const trackingData = logistics?.data;
   const airline = logistics?.metadata?.airline;
 
   return (
     <div className="container mx-auto p-4 md:p-6">
+      <div className="mb-4">
+        <Link href={`/${vesselId}/requests`}>
+          <Button
+              variant="ghost"
+              size="sm"
+              className="gap-1 text-blue-600 hover:text-blue-700"
+          >
+              <ArrowLeft className="h-4 w-4 text-blue-600 hover:text-blue-700" />
+              Back to Requests
+          </Button>
+        </Link>
+      </div>
       <div className="grid gap-6">
         {/* Waybill Header */}
         <div className="flex flex-col md:flex-row gap-6 items-start">
           <Avatar className="h-24 w-24 rounded-md border">
-            <AvatarImage src={"/placeholder.svg"} alt={airline?.name || "Авиакомпания"} />
+            <AvatarImage src={"/placeholder.svg"} alt={airline?.name || "Airline"} />
             <AvatarFallback className="rounded-md bg-blue-100 text-blue-600 text-xl">
               {airline?.iata_code || "WB"}
             </AvatarFallback>
@@ -36,7 +50,7 @@ export default function WaybillRecordView({userId, wayBillId, logistics}: Waybil
 
           <div className="flex-1 space-y-2">
             <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-              <h1 className="text-2xl font-bold">{airline?.name || "Накладная"}</h1>
+              <h1 className="text-2xl font-bold">{airline?.name || "Waybill"}</h1>
               <Badge className="w-fit bg-blue-600 hover:bg-blue-700">{wayBillId}</Badge>
               <StatusBadge status={trackingData?.status || "UNKNOWN"} />
             </div>
@@ -76,19 +90,19 @@ export default function WaybillRecordView({userId, wayBillId, logistics}: Waybil
                   Basic Information
                 </TabsTrigger>
                 <TabsTrigger
-                  value="measurements"
+                  value="statistics"
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent"
                 >
                   Statistics
                 </TabsTrigger>
                 <TabsTrigger
-                  value="medical-records"
+                  value="events"
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent"
                 >
                   Events
                 </TabsTrigger>
                 <TabsTrigger
-                  value="experiments"
+                  value="routes"
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent"
                 >
                   Routes
@@ -99,16 +113,16 @@ export default function WaybillRecordView({userId, wayBillId, logistics}: Waybil
                 <WaybillBasicInfo logistics={logistics} />
               </TabsContent>
 
-              <TabsContent value="measurements" className="pt-6">
-                <WaybillMeasurements logistics={logistics} />
+              <TabsContent value="statistics" className="pt-6">
+                <WaybillStatistics logistics={logistics} />
               </TabsContent>
 
-              <TabsContent value="medical-records" className="pt-6">
-                <WaybillRecords logistics={logistics} />
+              <TabsContent value="events" className="pt-6">
+                <WaybillEvents logistics={logistics} />
               </TabsContent>
 
-              <TabsContent value="experiments" className="pt-6">
-                <WaybillExperiments logistics={logistics} />
+              <TabsContent value="routes" className="pt-6">
+                <WaybillRoutes logistics={logistics} />
               </TabsContent>
             </Tabs>
           </div>
@@ -143,15 +157,15 @@ function StatusBadge({ status }: StatusBadgeProps) {
   const getStatusLabel = (status: string) => {
     switch (status.toUpperCase()) {
       case "DELIVERED":
-        return "Доставлено"
+        return "Delivered"
       case "IN_TRANSIT":
-        return "В пути"
+        return "In Transit"
       case "ARRIVED":
-        return "Прибыл"
+        return "Arrived"
       case "DEPARTED":
-        return "Отправлен"
+        return "Departed"
       case "BOOKED":
-        return "Забронировано"
+        return "Booked"
       default:
         return status
     }

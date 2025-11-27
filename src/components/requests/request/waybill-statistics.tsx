@@ -4,12 +4,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Download, Filter, MapPin, Package, Plane } from "lucide-react"
 import { Button } from "@/src/components/ui/button"
-import { useState } from "react"
 
-interface WaybillMeasurementsProps {
+interface WaybillStatisticsProps {
   logistics: any;
 }
-export function WaybillMeasurements({ logistics }: WaybillMeasurementsProps) {
+
+export function WaybillStatistics({ logistics }: WaybillStatisticsProps) {
   const events = logistics?.data?.events || []
   const routes = logistics?.data?.routes || []
 

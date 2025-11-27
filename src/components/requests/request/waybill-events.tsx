@@ -1,15 +1,15 @@
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
+import { Download, Filter, MapPin, Search } from "lucide-react"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
-import { Download, Filter, MapPin, Search } from "lucide-react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
 import { Input } from "@/src/components/ui/input"
 
-interface WaybillRecordsProps {
+interface WaybillEventsProps {
   logistics: any
 }
 
-export function WaybillRecords({ logistics }: WaybillRecordsProps) {
+export function WaybillEvents({ logistics }: WaybillEventsProps) {
   const events = logistics?.data?.events || []
 
   return (
