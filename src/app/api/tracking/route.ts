@@ -1,6 +1,6 @@
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
-    const wayBillId = searchParams.get('wayBillId');
+    const wayBillId = await searchParams.get('wayBillId');
     
     if (!wayBillId) {
       return Response.json({ error: 'wayBillId is required' }, { status: 400 });
