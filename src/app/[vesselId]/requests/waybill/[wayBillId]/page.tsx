@@ -14,7 +14,7 @@ export default async function RecordPage({params}: PageProps) {
     const {wayBillId} = await params;
     const cookieStore = await cookies();
     const userId = await cookieStore.get('USER_ID')?.value || 'default';
-    const logistics = await apiClient.get(`/api/tracking/${wayBillId}`);
+    const logistics = await apiClient.get(`${process.env.NEXT_PUBLIC_ABSOLUTE_URL}/api/tracking/${wayBillId}`);
 	
     return (
         <RecordContainer
