@@ -1,4 +1,4 @@
-import { RequestStatus, AccessStatus, RequestType, PoStatus, PaymentStatus, TSIConfirm } from '@prisma/client';
+import { RequestStatus, AccessStatus, RequestType, PoStatus, PaymentStatus, TSIConfirm, WayBillType } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { prismaClient } from '@/src/lib/server/prisma';
 
@@ -10,8 +10,9 @@ export async function POST(req: NextRequest) {
             identifier,
             poStatus,
             poNumber,
-            paymentStatus: paimentStatus,
+            paymentStatus,
             description,
+            wayBillType,
             wayBillNumber,
             storeLocation,
             status,
@@ -73,11 +74,12 @@ export async function POST(req: NextRequest) {
                 identifier,
                 poStatus: (poStatus as PoStatus) || PoStatus.WITHOUT_PO,
                 poNumber,
-                paymentStatus: (paimentStatus as PaymentStatus) || PaymentStatus.CREDIT_NOT_PAID,
+                paymentStatus: (paymentStatus as PaymentStatus) || PaymentStatus.CREDIT_NOT_PAID,
                 description,
-                wayBillNumber,
+                wayBillType: (wayBillType as WayBillType) || WayBillType.NO_WAYBILL,
+                wayBillNumber: wayBillNumber?.trim() || null,
                 storeLocation,
-                status: (status as RequestStatus) || RequestStatus.WAITING,
+                status: (status as RequestStatus) || RequestStatus.ON_HOLD,
                 offerNumber,
                 companyOfOrder,
                 countryOfOrder,
@@ -117,8 +119,9 @@ export async function PUT(req: NextRequest) {
             identifier,
             poStatus,
             poNumber,
-            paymentStatus: paimentStatus,
+            paymentStatus,
             description,
+            wayBillType,
             wayBillNumber,
             storeLocation,
             status,
@@ -186,11 +189,12 @@ export async function PUT(req: NextRequest) {
                 identifier,
                 poStatus: (poStatus as PoStatus) || PoStatus.WITHOUT_PO,
                 poNumber,
-                paymentStatus: (paimentStatus as PaymentStatus) || PaymentStatus.CREDIT_NOT_PAID,
+                paymentStatus: (paymentStatus as PaymentStatus) || PaymentStatus.CREDIT_NOT_PAID,
                 description,
-                wayBillNumber,
+                wayBillType: (wayBillType as WayBillType) || WayBillType.NO_WAYBILL,
+                wayBillNumber: wayBillNumber?.trim() || null,
                 storeLocation,
-                status: (status as RequestStatus) || RequestStatus.WAITING,
+                status: (status as RequestStatus) || RequestStatus.ON_HOLD,
                 offerNumber,
                 companyOfOrder,
                 countryOfOrder,
@@ -222,4 +226,3 @@ export async function PUT(req: NextRequest) {
         }, { status: 500 });
     }
 }
-

@@ -1,15 +1,13 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
-import { Download, Filter, MapPin, Search } from "lucide-react"
-import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
-import { Input } from "@/src/components/ui/input"
+import { MapPin } from "lucide-react"
 
-interface WaybillEventsProps {
+interface ParcelEventsProps {
   logistics: any
 }
 
-export function WaybillEvents({ logistics }: WaybillEventsProps) {
+export function ParcelEvents({ logistics }: ParcelEventsProps) {
   const events = logistics?.data?.events || []
 
   return (
@@ -26,18 +24,17 @@ export function WaybillEvents({ logistics }: WaybillEventsProps) {
                 <TableHead>Event code</TableHead>
                 <TableHead>Description</TableHead>
                 <TableHead>Location</TableHead>
-                <TableHead>Cargo</TableHead>
-                <TableHead>Flight</TableHead>
+                <TableHead>Transport Mode</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {events.map((event: any) => (
                 <TableRow key={event.order_id}>
                   <TableCell className="font-medium">
-                    {event.datetime_local?.actual 
-                      ? new Date(event.datetime_local.actual).toLocaleString('en-US')
-                      : event.datetime_local?.estimated 
-                        ? new Date(event.datetime_local.estimated).toLocaleString('en-US')
+                    {event.datetime?.actual 
+                      ? new Date(event.datetime.actual).toLocaleString('en-US')
+                      : event.datetime?.estimated 
+                        ? new Date(event.datetime.estimated).toLocaleString('en-US')
                         : "-"
                     }
                   </TableCell>
@@ -48,11 +45,16 @@ export function WaybillEvents({ logistics }: WaybillEventsProps) {
                   <TableCell>
                     <div className="flex items-center gap-1">
                       <MapPin className="h-3.5 w-3.5 text-gray-500" />
-                      <span className="text-sm">{event.location?.iata_code || "-"}</span>
+                      <span className="text-sm">{event.location?.name || "-"}</span>
                     </div>
                   </TableCell>
-                  <TableCell>{event.piece} pcs / {event.weight} kg</TableCell>
-                  <TableCell>{event.flight_number || "-"}</TableCell>
+                  <TableCell>
+                    {event.transport_mode ? (
+                      <TransportModeBadge mode={event.transport_mode} />
+                    ) : (
+                      "-"
+                    )}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -69,6 +71,8 @@ interface EventCodeBadgeProps {
 
 function EventCodeBadge({ code }: EventCodeBadgeProps) {
   const getCodeColor = (code: string) => {
+    if (!code) return "bg-gray-100 text-gray-800 hover:bg-gray-100"
+    
     switch (code.toUpperCase()) {
       case "BKD":
         return "bg-blue-100 text-blue-800 hover:bg-blue-100"
@@ -99,3 +103,31 @@ function EventCodeBadge({ code }: EventCodeBadgeProps) {
     </Badge>
   )
 }
+
+interface TransportModeBadgeProps {
+  mode: string
+}
+
+function TransportModeBadge({ mode }: TransportModeBadgeProps) {
+  const getModeColor = (mode: string) => {
+    switch (mode.toUpperCase()) {
+      case "AIR":
+        return "bg-sky-100 text-sky-800 hover:bg-sky-100"
+      case "SEA":
+        return "bg-blue-100 text-blue-800 hover:bg-blue-100"
+      case "ROAD":
+        return "bg-green-100 text-green-800 hover:bg-green-100"
+      case "RAIL":
+        return "bg-purple-100 text-purple-800 hover:bg-purple-100"
+      default:
+        return "bg-gray-100 text-gray-800 hover:bg-gray-100"
+    }
+  }
+
+  return (
+    <Badge variant="outline" className={`${getModeColor(mode)}`}>
+      {mode}
+    </Badge>
+  )
+}
+

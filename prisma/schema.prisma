@@ -164,8 +164,9 @@ model Request {
   paymentStatus  PaymentStatus?     @default(CREDIT_NOT_PAID)
   description    String?
   wayBillNumber  String?
+  wayBillType    WayBillType?      @default(NO_WAYBILL)
   storeLocation  String?
-  status         RequestStatus      @default(WAITING)
+  status         RequestStatus      @default(ON_HOLD)
   offerNumber    String?
   companyOfOrder String?
   countryOfOrder String?
@@ -467,3 +468,8 @@ enum InvitationStatus {
   REVOKED
 }
 
+enum WayBillType {
+  PARCEL_WAYBILL
+  AIR_WAYBILL
+  NO_WAYBILL
+}

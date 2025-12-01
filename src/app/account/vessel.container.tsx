@@ -26,7 +26,7 @@ export default function VesselsContainer({ userVessels }: VesselsContainerProps)
         fetchData()
     }, [])
 
-    const filteredLaboratories = useMemo(() => 
+    const filteredVessels = useMemo(() => 
         vessels?.filter(
             (vessel) =>
             vessel.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -54,26 +54,26 @@ export default function VesselsContainer({ userVessels }: VesselsContainerProps)
         return `${firstName.charAt(0)}${lastName.charAt(0)}`
     }, []);
 
-    const handleLabClick = useCallback((vesselId: string) => {
+    const handleVesselClick = useCallback((vesselId: string) => {
         router.push(`/${vesselId}/dashboard`)
     }, [userInfo, router]);
     
-    const handleJoinLab = useCallback(() => {
+    const handleJoinVessel = useCallback(() => {
         router.push("/vessel-setup?tab=join")
     }, [router]);
 
-    const handleCreateLab = useCallback(() => {
+    const handleCreateVessel = useCallback(() => {
         router.push("/vessel-setup?tab=create")
     }, [router]);
 
 
     return (
         <VesselsView
-            filteredLaboratories={filteredLaboratories}
-            handleCreateLab={handleCreateLab}
-            handleLabClick={handleLabClick}
+            handleCreateVessel={handleCreateVessel}
+            handleVesselClick={handleVesselClick}
+            handleJoinVessel={handleJoinVessel}
+            filteredVessels={filteredVessels}
             setSearchTerm={setSearchTerm}
-            handleJoinLab={handleJoinLab}
             getInitials={getInitials}
             formatDate={formatDate}
             searchTerm={searchTerm}

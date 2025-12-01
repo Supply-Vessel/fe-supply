@@ -78,6 +78,12 @@ export enum AccessStatus {
   PENDING = "PENDING",
 }
 
+export enum WayBillType {
+  PARCEL_WAYBILL = "PARCEL_WAYBILL",
+  AIR_WAYBILL = "AIR_WAYBILL",
+  NO_WAYBILL = "NO_WAYBILL",
+}
+
 // ==================== INTERFACES ====================
 
 export interface Vessel {
@@ -130,6 +136,7 @@ export interface Request {
   paymentStatus?: PaymentStatus;
   description?: string;
   wayBillNumber?: string;
+  wayBillType?: WayBillType;
   storeLocation?: string;
   status: RequestStatus;
   offerNumber?: string;
@@ -182,7 +189,7 @@ export interface CreateRequestData {
   requestTypeId?: string;
   poStatus?: PoStatus;
   poNumber?: string;
-  paimentStatus?: PaymentStatus;
+  paymentStatus?: PaymentStatus;
   status?: RequestStatus;
   offerNumber?: string;
   companyOfOrder?: string;
@@ -259,6 +266,7 @@ export interface RequestsListProps {
 export interface RequestEnums {
   requestStatus: RequestStatus[];
   paymentStatus: PaymentStatus[];
+  wayBillType: WayBillType[];
   requestType: RequestType[];
   tsiConfirm: TSIConfirm[];
   poStatus: PoStatus[];

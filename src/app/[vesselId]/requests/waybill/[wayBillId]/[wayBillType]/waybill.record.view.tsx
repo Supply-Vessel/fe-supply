@@ -2,27 +2,34 @@
 
 import { WaybillStatistics } from "@/src/components/requests/request/waybill-statistics"
 import { WaybillBasicInfo } from "@/src/components/requests/request/waybill-basic-info"
+import { ParcelStatistics } from "@/src/components/requests/request/parcel-statistics"
+import { ParcelBasicInfo } from "@/src/components/requests/request/parcel-basic-info"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
-import { WaybillEvents } from "@/src/components/requests/request/waybill-events"
 import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar"
-import { WaybillRoutes } from "@/src/components/requests/request/waybill-routes"
 import { ArrowLeft, Calendar, Clock, MapPin } from "lucide-react"
+import { WayBillType } from "@/src/components/requests/types";
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 
 export interface WaybillRecordViewProps {
+    wayBillType: WayBillType;
     wayBillId: string;
     vesselId: string;
     userId: string;
     logistics: any;
 }
 
-export default function WaybillRecordView({userId, wayBillId, logistics, vesselId}: WaybillRecordViewProps) {
+export default function WaybillRecordView({userId, wayBillId, wayBillType, logistics, vesselId}: WaybillRecordViewProps) {
   const router = useRouter();
   const trackingData = logistics?.data;
   const airline = logistics?.metadata?.airline;
+  const parcelCompany = logistics?.metadata?.parcel_company;
+  
+  const isParcel = wayBillType === WayBillType.PARCEL_WAYBILL;
+  const companyName = isParcel ? (parcelCompany?.name || "Parcel") : (airline?.name || "Waybill");
+  const companyCode = isParcel ? parcelCompany?.carrier_code : airline?.iata_code;
 
   return (
     <div className="container mx-auto p-4 md:p-6">
@@ -42,15 +49,15 @@ export default function WaybillRecordView({userId, wayBillId, logistics, vesselI
         {/* Waybill Header */}
         <div className="flex flex-col md:flex-row gap-6 items-start">
           <Avatar className="h-24 w-24 rounded-md border">
-            <AvatarImage src={"/placeholder.svg"} alt={airline?.name || "Airline"} />
+            <AvatarImage src={"/placeholder.svg"} alt={companyName} />
             <AvatarFallback className="rounded-md bg-blue-100 text-blue-600 text-xl">
-              {airline?.iata_code || "WB"}
+              {companyCode || "WB"}
             </AvatarFallback>
           </Avatar>
 
           <div className="flex-1 space-y-2">
             <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-              <h1 className="text-2xl font-bold">{airline?.name || "Waybill"}</h1>
+              <h1 className="text-2xl font-bold">{companyName}</h1>
               <Badge className="w-fit bg-blue-600 hover:bg-blue-700">{wayBillId}</Badge>
               <StatusBadge status={trackingData?.status || "UNKNOWN"} />
             </div>
@@ -59,15 +66,20 @@ export default function WaybillRecordView({userId, wayBillId, logistics, vesselI
               <div className="flex items-center gap-2 text-gray-600">
                 <MapPin className="h-4 w-4" />
                 <span className="text-sm">
-                  {trackingData?.from?.iata_code} → {trackingData?.to?.iata_code}
+                  {isParcel 
+                    ? `${trackingData?.from?.country_code || "?"} → ${trackingData?.to?.country_code || "?"}`
+                    : `${trackingData?.from?.iata_code || "?"} → ${trackingData?.to?.iata_code || "?"}`
+                  }
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-gray-600">
-                <Calendar className="h-4 w-4" />
-                <span className="text-sm">
-                  Flight: {trackingData?.flight_number}
-                </span>
-              </div>
+              {!isParcel && trackingData?.flight_number && (
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Calendar className="h-4 w-4" />
+                  <span className="text-sm">
+                    Flight: {trackingData.flight_number}
+                  </span>
+                </div>
+              )}
               <div className="flex items-center gap-2 text-gray-600">
                 <Clock className="h-4 w-4" />
                 <span className="text-sm">
@@ -95,35 +107,32 @@ export default function WaybillRecordView({userId, wayBillId, logistics, vesselI
                 >
                   Statistics
                 </TabsTrigger>
-                <TabsTrigger
-                  value="events"
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent"
-                >
-                  Events
-                </TabsTrigger>
-                <TabsTrigger
-                  value="routes"
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent"
-                >
-                  Routes
-                </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="basic-info" className="pt-6">
-                <WaybillBasicInfo logistics={logistics} />
-              </TabsContent>
+              {wayBillType === WayBillType.AIR_WAYBILL && 
+              <>
+                <TabsContent value="basic-info" className="pt-6">
+                  <WaybillBasicInfo logistics={logistics} />
+                </TabsContent>
 
-              <TabsContent value="statistics" className="pt-6">
-                <WaybillStatistics logistics={logistics} />
-              </TabsContent>
+                <TabsContent value="statistics" className="pt-6">
+                  <WaybillStatistics logistics={logistics} />
+                </TabsContent>
+              </>
+              }
 
-              <TabsContent value="events" className="pt-6">
-                <WaybillEvents logistics={logistics} />
-              </TabsContent>
+              {wayBillType === WayBillType.PARCEL_WAYBILL && 
+              <>
+                <TabsContent value="basic-info" className="pt-6">
+                  <ParcelBasicInfo logistics={logistics} />
+                </TabsContent>
 
-              <TabsContent value="routes" className="pt-6">
-                <WaybillRoutes logistics={logistics} />
-              </TabsContent>
+                <TabsContent value="statistics" className="pt-6">
+                  <ParcelStatistics logistics={logistics} />
+                </TabsContent>
+              </>
+              }
+              
             </Tabs>
           </div>
         </div>

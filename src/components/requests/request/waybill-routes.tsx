@@ -14,24 +14,6 @@ export function WaybillRoutes({ logistics }: WaybillRoutesProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="relative w-full sm:w-64">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-          <Input type="search" placeholder="Search routes..." className="w-full pl-8" />
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="flex items-center gap-2">
-            <Filter className="h-4 w-4" />
-            Filter
-          </Button>
-          <Button variant="outline" size="sm" className="flex items-center gap-2">
-            <Download className="h-4 w-4" />
-            Export
-          </Button>
-        </div>
-      </div>
-
       <Card>
         <CardHeader>
           <CardTitle>Routes of transportation</CardTitle>
@@ -84,9 +66,9 @@ export function WaybillRoutes({ logistics }: WaybillRoutesProps) {
                   <TableCell>
                     <div className="text-xs">
                       {route.departure_datetime_local?.actual 
-                        ? new Date(route.departure_datetime_local.actual).toLocaleString('ru-RU', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+                        ? new Date(route.departure_datetime_local.actual).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
                         : route.departure_datetime_local?.estimated 
-                          ? new Date(route.departure_datetime_local.estimated).toLocaleString('ru-RU', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+                          ? new Date(route.departure_datetime_local.estimated).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
                           : "-"
                       }
                     </div>
@@ -94,9 +76,9 @@ export function WaybillRoutes({ logistics }: WaybillRoutesProps) {
                   <TableCell>
                     <div className="text-xs">
                       {route.arrival_datetime_local?.actual 
-                        ? new Date(route.arrival_datetime_local.actual).toLocaleString('ru-RU', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+                        ? new Date(route.arrival_datetime_local.actual).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
                         : route.arrival_datetime_local?.estimated 
-                          ? new Date(route.arrival_datetime_local.estimated).toLocaleString('ru-RU', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+                          ? new Date(route.arrival_datetime_local.estimated).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
                           : "-"
                       }
                     </div>
@@ -105,54 +87,6 @@ export function WaybillRoutes({ logistics }: WaybillRoutesProps) {
               ))}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Details of routes</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {routes.map((route: any, index: number) => (
-              <div 
-                key={route.order_id} 
-                className={`flex items-center p-3 border rounded-md ${
-                  route.status === 'ARRIVED' 
-                    ? 'bg-green-50 border-green-200' 
-                    : route.status === 'DEPARTED' 
-                      ? 'bg-blue-50 border-blue-200' 
-                      : 'bg-gray-50 border-gray-200'
-                }`}
-              >
-                <div className={`flex-shrink-0 w-2 h-2 rounded-full mr-3 ${
-                  route.status === 'ARRIVED' 
-                    ? 'bg-green-600' 
-                    : route.status === 'DEPARTED' 
-                      ? 'bg-blue-600' 
-                      : 'bg-gray-600'
-                }`}></div>
-                <div className="flex-1">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <div>
-                      <p className="font-medium">Segment {route.order_id}: {route.from?.name} → {route.to?.name}</p>
-                      <p className="text-sm text-gray-600">Flight {route.flight_number} • {route.piece} pcs • {route.weight} kg</p>
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      {route.arrival_datetime_local?.actual 
-                        ? `Arrived: ${new Date(route.arrival_datetime_local.actual).toLocaleString('ru-RU')}`
-                        : route.departure_datetime_local?.actual 
-                          ? `Departed: ${new Date(route.departure_datetime_local.actual).toLocaleString('ru-RU')}`
-                          : route.departure_datetime_local?.estimated 
-                            ? `Expected: ${new Date(route.departure_datetime_local.estimated).toLocaleString('ru-RU')}`
-                            : "Time unknown"
-                      }
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
         </CardContent>
       </Card>
     </div>

@@ -1,5 +1,5 @@
+import { RequestStatus, PoStatus, TSIConfirm, PaymentStatus, RequestType, Role, WayBillType } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
-import { RequestStatus, PoStatus, TSIConfirm, PaymentStatus, RequestType, Role } from '@prisma/client';
 
 // GET /api/requests/enums - получить enums для requests
 export async function GET() {
@@ -7,6 +7,7 @@ export async function GET() {
         const enums = {
             requestStatus: Object.values(RequestStatus),
             paymentStatus: Object.values(PaymentStatus),
+            wayBillType: Object.values(WayBillType),
             requestType: Object.values(RequestType),
             tsiConfirm: Object.values(TSIConfirm),
             poStatus: Object.values(PoStatus),

@@ -1,11 +1,11 @@
 "use client"
 
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/src/components/ui/pagination"
-import { Request, RequestStatus, RequestType, PoStatus, TSIConfirm, PaymentStatus, type RequestEnums, type RequestPagination } from "./types"
+import { Request, RequestStatus, RequestType, PoStatus, TSIConfirm, PaymentStatus, type RequestEnums, type RequestPagination, WayBillType } from "./types"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
 import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/popover"
-import { LayoutGrid, LayoutList, Check, X, Plus, Link2 } from "lucide-react"
+import { LayoutGrid, LayoutList, Check, X, Plus, Link2, Plane, Package } from "lucide-react"
 import { Checkbox } from "@/src/components/ui/checkbox"
 import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/src/components/ui/button"
@@ -48,6 +48,7 @@ interface ColumnVisibility {
   paymentStatus: boolean;
   companyOfOrder: boolean;
   countryOfOrder: boolean;
+  wayBillType: boolean;
   wayBillNumber: boolean;
   storeLocation: boolean;
 }
@@ -66,11 +67,12 @@ export function RequestsList({requests, requestPagination, setPagination, handle
     description: true,
     status: true,
     poStatus: true,
-    poNumber: true,
+    poNumber: false,
     tsiConfirm: true,
     paymentStatus: true,
     companyOfOrder: true,
     countryOfOrder: true,
+    wayBillType: false,
     wayBillNumber: true,
     storeLocation: true,
   })
@@ -173,7 +175,7 @@ export function RequestsList({requests, requestPagination, setPagination, handle
     setNewRowData({
       identifier: "",
       description: "",
-      status: RequestStatus.WAITING,
+      status: RequestStatus.ON_HOLD,
       poStatus: PoStatus.WITHOUT_PO,
       vesselId: Array.isArray(vesselId) ?vesselId[0] :vesselId || "",
       requestType: defaultType as RequestType,
@@ -224,7 +226,8 @@ export function RequestsList({requests, requestPagination, setPagination, handle
       request.companyOfOrder?.toLowerCase().includes(query) ||
       request.countryOfOrder?.toLowerCase().includes(query) ||
       request.storeLocation?.toLowerCase().includes(query) ||
-      request.wayBillNumber?.toLowerCase().includes(query)
+      request.wayBillNumber?.toLowerCase().includes(query) ||
+      request.wayBillType?.toLowerCase().includes(query)
     )
   }, [currentRequests, searchQuery])
 
@@ -316,6 +319,17 @@ export function RequestsList({requests, requestPagination, setPagination, handle
     }
   }
 
+  const getWayBillNumberPlaceholder = (wayBillType?: WayBillType) => {
+    switch (wayBillType) {
+      case WayBillType.AIR_WAYBILL:
+        return "020-17363006"
+      case WayBillType.PARCEL_WAYBILL:
+        return "AENM0021834400"
+      default:
+        return "waybill number..."
+    }
+  }
+
   const renderEditableCell = (request: Request, field: keyof Request, isEditing: boolean) => {
     const requestId = request.id || ""
     const currentValue = isEditing ? (editData[requestId]?.[field] ?? request[field]) : request[field]
@@ -357,12 +371,17 @@ export function RequestsList({requests, requestPagination, setPagination, handle
         return currentValue ? (
           <Badge
             variant="outline"
-            className="bg-blue-100 text-blue-800 hover:bg-blue-200 flex gap-1 justify-center w-32 flex-nowrap whitespace-nowrap cursor-pointer"
+            className={`${request.wayBillType === WayBillType.NO_WAYBILL && "opacity-50 cursor-not-allowed"} bg-blue-100 text-blue-800 hover:bg-blue-200 min-w-36 flex-nowrap flex gap-1 justify-center whitespace-nowrap cursor-pointer`}
             onClick={() => {
-              router.push(`/${vesselId}/requests/waybill/${currentValue}`)
-            }}>
+              if (request.wayBillType !== WayBillType.NO_WAYBILL) {
+                router.push(`/${vesselId}/requests/waybill/${currentValue}/${request.wayBillType}`)
+              }
+          }}>
+            {request.wayBillType !== WayBillType.NO_WAYBILL && (
+              request.wayBillType === WayBillType.AIR_WAYBILL ? <Plane className="h-4 w-4" /> : <Package className="h-4 w-4" /> 
+            )}
             {currentValue as string}
-            <Link2 className="h-4 w-4" />
+            {request.wayBillType === WayBillType.NO_WAYBILL ? null : <Link2 className="h-4 w-4" />}
           </Badge>
         ) : null
       }
@@ -373,7 +392,7 @@ export function RequestsList({requests, requestPagination, setPagination, handle
     if (field === "status") {
       return (
         <Select
-          value={currentValue as string || RequestStatus.WAITING}
+          value={currentValue as string || RequestStatus.ON_HOLD}
           onValueChange={(value) => handleEditFieldChange(requestId, field, value)}
         >
           <SelectTrigger className="h-8 w-full">
@@ -437,6 +456,24 @@ export function RequestsList({requests, requestPagination, setPagination, handle
             {requestEnums.paymentStatus.map((paymentStatus) => (
               <SelectItem key={paymentStatus} value={paymentStatus}>{paymentStatus}</SelectItem>
             ))}
+          </SelectContent>
+        </Select>
+      )
+    }
+
+    if (field === "wayBillType") {
+      return (
+        <Select
+          value={currentValue as string || WayBillType.NO_WAYBILL}
+          onValueChange={(value) => handleEditFieldChange(requestId, field, value || undefined)}
+        >
+          <SelectTrigger className="h-8 w-16">
+            <SelectValue placeholder="Not set" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={WayBillType.NO_WAYBILL}>No bill</SelectItem>
+            <SelectItem value={WayBillType.AIR_WAYBILL}>Airbill</SelectItem>
+            <SelectItem value={WayBillType.PARCEL_WAYBILL}>Parcel</SelectItem>
           </SelectContent>
         </Select>
       )
@@ -447,7 +484,8 @@ export function RequestsList({requests, requestPagination, setPagination, handle
         type="text"
         value={currentValue as string || ""}
         onChange={(e) => handleEditFieldChange(requestId, field, e.target.value)}
-        className="h-8"
+        className="h-8 w-32"
+        placeholder={field === "wayBillNumber" ? getWayBillNumberPlaceholder(editData[requestId]?.wayBillType as WayBillType) : `Enter ${field}...`}
       />
     )
   }
@@ -458,7 +496,7 @@ export function RequestsList({requests, requestPagination, setPagination, handle
     if (field === "status") {
       return (
         <Select
-          value={currentValue as string || RequestStatus.WAITING}
+          value={currentValue as string || RequestStatus.ON_HOLD}
           onValueChange={(value) => handleNewRowFieldChange(field, value)}
         >
           <SelectTrigger className="h-8 w-full">
@@ -527,13 +565,31 @@ export function RequestsList({requests, requestPagination, setPagination, handle
       )
     }
 
+    if (field === "wayBillType") {
+      return (
+        <Select
+          value={currentValue as string || WayBillType.NO_WAYBILL}
+          onValueChange={(value) => handleNewRowFieldChange(field, value)}
+        >
+          <SelectTrigger className="h-8 w-16">
+            <SelectValue placeholder="Not set" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={WayBillType.NO_WAYBILL}>No bill</SelectItem>
+            <SelectItem value={WayBillType.AIR_WAYBILL}>Airbill</SelectItem>
+            <SelectItem value={WayBillType.PARCEL_WAYBILL}>Parcel</SelectItem>
+          </SelectContent>
+        </Select>
+      )
+    }
+    
     return (
       <Input
         type="text"
         value={currentValue as string || ""}
         onChange={(e) => handleNewRowFieldChange(field, e.target.value)}
-        className="h-8"
-        placeholder={`Enter ${field}...`}
+        className="h-8 w-32"
+        placeholder={field === "wayBillNumber" ? getWayBillNumberPlaceholder(newRowData?.wayBillType as WayBillType) : `Enter ${field}...`}
         required={field === "identifier"}
       />
     )
@@ -543,8 +599,8 @@ export function RequestsList({requests, requestPagination, setPagination, handle
     <Card>
       <div className="flex items-center justify-between border-b border-gray-200 p-4">
         <div className="flex items-center gap-2">
-          <Checkbox checked={selectedRequests.length === filteredRequests.length && filteredRequests.length > 0} onCheckedChange={toggleAllRequests} />
-          <span className="text-sm text-gray-500">{selectedRequests.length} selected</span>
+          {/* <Checkbox checked={selectedRequests.length === filteredRequests.length && filteredRequests.length > 0} onCheckedChange={toggleAllRequests} />
+          <span className="text-sm text-gray-500">{selectedRequests.length} selected</span> */}
           <Badge variant="outline" className={getRequestTypeColor(defaultType)}>
             {defaultType || "N/A"}
           </Badge>
@@ -704,7 +760,7 @@ export function RequestsList({requests, requestPagination, setPagination, handle
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-12"></TableHead>
+                {/* <TableHead className="w-12"></TableHead> */}
                 {columnVisibility.identifier && <TableHead>Identifier</TableHead>}
                 {columnVisibility.poStatus && <TableHead>PO Status</TableHead>}
                 {columnVisibility.poNumber && <TableHead>PO Number</TableHead>}
@@ -722,9 +778,9 @@ export function RequestsList({requests, requestPagination, setPagination, handle
             <TableBody>
               {isAddingNew && (
                 <TableRow  className="bg-blue-50">
-                  <TableCell>
+                  {/* <TableCell>
                     <Checkbox disabled />
-                  </TableCell>
+                  </TableCell> */}
                   {columnVisibility.identifier && <TableCell>{renderNewRowCell("identifier")}</TableCell>}
                   {columnVisibility.poStatus && <TableCell>{renderNewRowCell("poStatus")}</TableCell>}
                   {columnVisibility.poNumber && <TableCell>{renderNewRowCell("poNumber")}</TableCell>}
@@ -735,7 +791,12 @@ export function RequestsList({requests, requestPagination, setPagination, handle
                   {columnVisibility.companyOfOrder && <TableCell>{renderNewRowCell("companyOfOrder")}</TableCell>}
                   {columnVisibility.countryOfOrder && <TableCell>{renderNewRowCell("countryOfOrder")}</TableCell>}
                   {columnVisibility.storeLocation && <TableCell>{renderNewRowCell("storeLocation")}</TableCell>}
-                  {columnVisibility.wayBillNumber && <TableCell>{renderNewRowCell("wayBillNumber")}</TableCell>}
+                  {columnVisibility.wayBillNumber && (
+                    <TableCell className="w-60 flex items-center gap-1">
+                      {renderNewRowCell("wayBillType")}
+                      {renderNewRowCell("wayBillNumber")}
+                    </TableCell>
+                  )}
                   <TableCell>
                     <div className="flex items-center gap-1">
                       <Button
@@ -767,13 +828,13 @@ export function RequestsList({requests, requestPagination, setPagination, handle
                     className={"cursor-pointer " + (isEditing ? "bg-yellow-50" : getRowColor(request.status))}
                     key={request.id}
                   >
-                    <TableCell>
+                    {/* <TableCell>
                       <Checkbox
                         checked={selectedRequests.includes(request.id || "")}
                         onCheckedChange={() => toggleRequestSelection(request.id || "")}
                         disabled={isEditing}
                       />
-                    </TableCell>
+                    </TableCell> */}
                     {columnVisibility.identifier && (
                       <TableCell className="font-medium">
                         {renderEditableCell(request, "identifier", isEditing)}
@@ -788,7 +849,12 @@ export function RequestsList({requests, requestPagination, setPagination, handle
                     {columnVisibility.companyOfOrder && <TableCell>{renderEditableCell(request, "companyOfOrder", isEditing)}</TableCell>}
                     {columnVisibility.countryOfOrder && <TableCell>{renderEditableCell(request, "countryOfOrder", isEditing)}</TableCell>}
                     {columnVisibility.storeLocation && <TableCell>{renderEditableCell(request, "storeLocation", isEditing)}</TableCell>}
-                    {columnVisibility.wayBillNumber && <TableCell>{renderEditableCell(request, "wayBillNumber", isEditing)}</TableCell>}
+                    {columnVisibility.wayBillNumber && (
+                      <TableCell className={`${isEditing ? "w-60 flex items-center gap-1" : ""}`}>
+                        {isEditing && renderEditableCell(request, "wayBillType", isEditing)}
+                        {renderEditableCell(request, "wayBillNumber", isEditing)}
+                      </TableCell>
+                    )}
                     <TableCell>
                       {isEditing ? (
                         <div className="flex items-center gap-1">

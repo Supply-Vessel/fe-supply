@@ -1,24 +1,24 @@
 import { Building2, Plus, Users, Calendar, MapPin, Mail, User, ChevronRight, Search, BriefcaseBusiness } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Avatar, AvatarFallback } from "@/src/components/ui/avatar"
-import type { LaboratoriesViewProps } from "./types"
+import type { VesselsViewProps } from "./types"
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Badge } from "@/src/components/ui/badge"
 
 export default function VesselsView(
     {
-        filteredLaboratories,
-        handleCreateLab,
-        handleLabClick,
+        filteredVessels,
+        handleCreateVessel,
+        handleVesselClick,
         setSearchTerm,
-        handleJoinLab,
+        handleJoinVessel,
         getInitials,
         formatDate,
         searchTerm,
         isLoading,
         userInfo,
-    }: LaboratoriesViewProps) {
+    }: VesselsViewProps) {
 
     if (isLoading) {
         return (
@@ -99,11 +99,11 @@ export default function VesselsView(
                         </div>
 
                         <div className="flex space-x-3 m-auto md:m-0">
-                            <Button onClick={handleJoinLab} variant="outline" className="flex items-center">
+                            <Button onClick={handleJoinVessel} variant="outline" className="flex items-center">
                                 <Users className="h-4 w-4 mr-2" />
                                 Join Vessel
                             </Button>
-                            <Button onClick={handleCreateLab} className="bg-blue-600 hover:bg-blue-700 flex items-center">
+                            <Button onClick={handleCreateVessel} className="bg-blue-600 hover:bg-blue-700 flex items-center">
                                 <Plus className="h-4 w-4 mr-2" />
                                 Create New Vessel
                             </Button>
@@ -120,7 +120,7 @@ export default function VesselsView(
                         <div>
                             <h2 className="text-xl font-semibold text-gray-900">Your Vessels</h2>
                             <p className="text-gray-600 mt-1">
-                                {filteredLaboratories.length} vessel{filteredLaboratories.length !== 1 ? "s" : ""} available
+                                {filteredVessels.length} vessel{filteredVessels.length !== 1 ? "s" : ""} available
                             </p>
                         </div>
                     </div>
@@ -138,7 +138,7 @@ export default function VesselsView(
                 </div>
 
                 {/* Laboratory cards */}
-                {filteredLaboratories.length === 0 ? (
+                {filteredVessels.length === 0 ? (
                 <div className="text-center py-12">
                     <Building2 className="mx-auto h-12 w-12 text-gray-400" />
                     <h3 className="mt-2 text-sm font-medium text-gray-900">No vessels found</h3>
@@ -148,11 +148,11 @@ export default function VesselsView(
                             : "Get started by creating a new vessel or joining an existing one."}
                     </p>
                     <div className="mt-6 flex justify-center space-x-3">
-                        <Button onClick={handleJoinLab} variant="outline">
+                        <Button onClick={handleJoinVessel} variant="outline">
                             <Users className="h-4 w-4 mr-2" />
                             Join Vessel
                         </Button>
-                        <Button onClick={handleCreateLab} className="bg-blue-600 hover:bg-blue-700">
+                        <Button onClick={handleCreateVessel} className="bg-blue-600 hover:bg-blue-700">
                             <Plus className="h-4 w-4 mr-2" />
                             Create New Vessel
                         </Button>
@@ -160,27 +160,27 @@ export default function VesselsView(
                 </div>
                 ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredLaboratories.map((lab) => (
+                    {filteredVessels.map((vessel) => (
                     <Card
-                        key={lab.id}
+                        key={vessel.id}
                         className="hover:shadow-md transition-shadow duration-200 cursor-pointer group"
-                        onClick={() => handleLabClick(lab.name)}
+                        onClick={() => handleVesselClick(vessel.name)}
                     >
                         <CardHeader className="pb-3">
                             <div className="flex items-start justify-between">
                                 <div className="flex-1">
                                     <CardTitle className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-                                        {lab.name}
+                                        {vessel.name}
                                     </CardTitle>
                                     <CardDescription className="mt-1">
                                         <div className="flex gap-1 items-center text-sm text-gray-600">
                                             <User className="h-3 w-3" />
                                             <p>Owner:</p>
-                                            {lab.username}
+                                            {vessel.username}
                                         </div>
                                         <Badge variant="secondary" className="flex gap-1 w-fit mt-1 text-xs">
                                             <p>Position:</p>
-                                            {lab.position}
+                                            {vessel.position}
                                         </Badge>
                                         <div className="flex gap-1 items-center text-sm text-gray-600">
                                             <BriefcaseBusiness className="h-3 w-3" />
@@ -194,12 +194,12 @@ export default function VesselsView(
                         </CardHeader>
 
                         <CardContent className="pt-0">
-                            {lab.description && <p className="text-sm text-gray-600 mb-4 line-clamp-3">{lab.description}</p>}
+                            {vessel.description && <p className="text-sm text-gray-600 mb-4 line-clamp-3">{vessel.description}</p>}
 
                             <div className="flex items-center justify-between text-xs text-gray-500">
                                 <div className="flex items-center">
                                     <Calendar className="h-3 w-3 mr-1" />
-                                    Created {lab && formatDate(lab.createdAt)}
+                                    Created {vessel && formatDate(vessel.createdAt)}
                                 </div>
                             </div>
                         </CardContent>

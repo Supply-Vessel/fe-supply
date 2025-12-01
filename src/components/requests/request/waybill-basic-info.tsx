@@ -19,19 +19,19 @@ export function WaybillBasicInfo({ logistics }: { logistics: any }) {
             <InfoItem label="Weight" value={trackingData?.weight ? `${trackingData.weight} kg` : "-"} />
             <InfoItem 
               label="Estimated departure date" 
-              value={trackingData?.departure_datetime_local?.estimated ? new Date(trackingData.departure_datetime_local.estimated).toLocaleString('ru-RU') : "-"} 
+              value={trackingData?.departure_datetime_local?.estimated ? new Date(trackingData.departure_datetime_local.estimated).toLocaleString('en-US') : "-"} 
             />
             <InfoItem 
               label="Actual departure date" 
-              value={trackingData?.departure_datetime_local?.actual ? new Date(trackingData.departure_datetime_local.actual).toLocaleString('ru-RU') : "-"} 
+              value={trackingData?.departure_datetime_local?.actual ? new Date(trackingData.departure_datetime_local.actual).toLocaleString('en-US') : "-"} 
             />
             <InfoItem 
               label="Estimated arrival date" 
-              value={trackingData?.arrival_datetime_local?.estimated ? new Date(trackingData.arrival_datetime_local.estimated).toLocaleString('ru-RU') : "-"} 
+              value={trackingData?.arrival_datetime_local?.estimated ? new Date(trackingData.arrival_datetime_local.estimated).toLocaleString('en-US') : "-"} 
             />
             <InfoItem 
               label="Actual arrival date" 
-              value={trackingData?.arrival_datetime_local?.actual ? new Date(trackingData.arrival_datetime_local.actual).toLocaleString('ru-RU') : "-"} 
+              value={trackingData?.arrival_datetime_local?.actual ? new Date(trackingData.arrival_datetime_local.actual).toLocaleString('en-US') : "-"} 
             />
           </div>
         </CardContent>

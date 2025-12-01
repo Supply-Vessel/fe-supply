@@ -1,14 +1,8 @@
-import type { SetStateAction } from "react"
 import { Role, AccessStatus, ExperimentStatus, RequestStatus } from "@prisma/client"
+import type { SetStateAction } from "react"
 
 // Re-export Prisma enums for convenience
 export { Role, AccessStatus, ExperimentStatus, RequestStatus }
-
-export enum Sex {
-    MALE = "MALE",
-    FEMALE = "FEMALE",
-    UNKNOWN = "UNKNOWN"
-}
 
 export interface Vessel {
     id: string
@@ -23,15 +17,6 @@ export interface Vessel {
     position: Role
     description: string | null
     userRole: Role
-}
-
-export interface AnimalType {
-    id: string
-    name: string
-    laboratoryId: string
-    description: string | null
-    createdAt: Date
-    updatedAt: Date
 }
 
 export interface UserInfo {
@@ -50,14 +35,14 @@ export interface VesselsContainerProps {
     userVessels: Vessel[];
 }
 
-export interface LaboratoriesViewProps {
+export interface VesselsViewProps {
     getInitials: (firstName: string, lastName: string) => string;
     setSearchTerm: React.Dispatch<SetStateAction<string>>;
     formatDate: (date: Date | string) => string
-    filteredLaboratories: Vessel[] | [];
-    handleLabClick: (vesselId: string) => void;
-    handleCreateLab: VoidFunction;
-    handleJoinLab: VoidFunction;
+    filteredVessels: Vessel[] | [];
+    handleVesselClick: (vesselId: string) => void;
+    handleCreateVessel: VoidFunction;
+    handleJoinVessel: VoidFunction;
     userInfo: UserInfo | null;
     isLoading: boolean;
     searchTerm: string;

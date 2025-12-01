@@ -1,6 +1,6 @@
 "use client"
 
-import type { AnimalRecord } from "@/src/app/[vesselId]/requests/waybill/[wayBillId]/types"
+import type { AnimalRecord } from "@/src/app/[vesselId]/requests/waybill/[wayBillId]/[wayBillType]/types"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/src/components/ui/chart"
 import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 
