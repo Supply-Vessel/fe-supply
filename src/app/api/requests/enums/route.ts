@@ -5,13 +5,13 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET() {
     try {
         const enums = {
-            requestStatus: Object.values(RequestStatus),
-            paymentStatus: Object.values(PaymentStatus),
-            wayBillType: Object.values(WayBillType),
-            requestType: Object.values(RequestType),
-            tsiConfirm: Object.values(TSIConfirm),
-            poStatus: Object.values(PoStatus),
-            role: Object.values(Role),
+            requestStatus: RequestStatus ? Object.values(RequestStatus) : [],
+            paymentStatus: PaymentStatus ? Object.values(PaymentStatus) : [],
+            wayBillType: WayBillType ? Object.values(WayBillType) : [],
+            requestType: RequestType ? Object.values(RequestType) : [],
+            tsiConfirm: TSIConfirm ? Object.values(TSIConfirm) : [],
+            poStatus: PoStatus ? Object.values(PoStatus) : [],
+            role: Role ? Object.values(Role) : [],
         };
 
         return NextResponse.json({
