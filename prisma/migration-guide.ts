@@ -19,6 +19,11 @@
  * ===================================================================
  */
 
+// Команда	Когда использовать
+// npx prisma db push	Development - быстрая синхронизация схемы
+// npx prisma migrate dev	Создание миграций для version control
+// npx prisma migrate reset	Пересоздать БД с нуля (удалит данные!)
+
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
