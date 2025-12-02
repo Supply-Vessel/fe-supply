@@ -65,7 +65,7 @@ export function StatusStatisticsChart({requests}: {requests: Request[]}) {
   return (
     <ChartContainer
       config={config}
-      className="h-[300px] w-[315px] md:w-full"
+      className="h-[300px] [display: contents] w-full md:w-full"
     >
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>

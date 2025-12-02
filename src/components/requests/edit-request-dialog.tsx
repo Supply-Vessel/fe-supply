@@ -1,7 +1,7 @@
 "use client"
 
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/src/components/ui/form"
-import { RequestStatus, RequestType, PaymentStatus, TSIConfirm, PoStatus, type RequestEnums, type Request } from "./types"
+import { RequestStatus, RequestType, PaymentStatus, TSIConfirm, PoStatus, type RequestEnums, type Request, WayBillType } from "./types"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/src/components/ui/button"
@@ -24,6 +24,7 @@ const formSchema = z.object({
     id: z.string().min(1, "Id is required"),
     identifier: z.string().min(1, "Identifier is required").max(50, "Identifier must be less than 5 characters"),
     description: z.string().optional(),
+    wayBillType: z.nativeEnum(WayBillType).default(WayBillType.NO_WAYBILL),
     wayBillNumber: z.string().optional(),
     storeLocation: z.string().optional(),
     requestType: z.nativeEnum(RequestType),
@@ -49,6 +50,17 @@ const formSchema = z.object({
     open: boolean
 }
 
+function getWayBillNumberPlaceholder(wayBillType?: WayBillType) {
+  switch (wayBillType) {
+    case WayBillType.AIR_WAYBILL:
+      return "020-17363006"
+    case WayBillType.PARCEL_WAYBILL:
+      return "AENM0021834400"
+    default:
+      return "waybill number..."
+  }
+}
+
 export function EditAnimalDialog({ 
     loadingButtonText,
     submitButtonText,
@@ -69,6 +81,7 @@ export function EditAnimalDialog({
         status: RequestStatus.WAITING,
         identifier: "",
         description: "",
+        wayBillType: WayBillType.NO_WAYBILL,
         wayBillNumber: "",
         storeLocation: "",
         requestType: undefined,
@@ -88,6 +101,7 @@ export function EditAnimalDialog({
         vesselId:vesselId,
         identifier: selectedRequest?.identifier || "",
         description: selectedRequest?.description || "",
+        wayBillType: selectedRequest?.wayBillType || WayBillType.NO_WAYBILL,
         wayBillNumber: selectedRequest?.wayBillNumber || "",
         storeLocation: selectedRequest?.storeLocation || "",
         requestType: selectedRequest?.requestType || undefined,
@@ -105,6 +119,7 @@ export function EditAnimalDialog({
         status: RequestStatus.WAITING,
         identifier: "",
         description: "",
+        wayBillType: WayBillType.NO_WAYBILL,
         wayBillNumber: "",
         storeLocation: "",
         requestType: undefined,
@@ -392,6 +407,32 @@ export function EditAnimalDialog({
                   </FormItem>
                 )}
               />
+              {/* way bill type */}
+              <FormField
+                control={form.control}
+                name="wayBillType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Way Bill Type</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select way bill type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {requestEnums.wayBillType.map((wayBillType) => (
+                          <SelectItem key={wayBillType} value={wayBillType}>
+                            {wayBillType}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>Way bill type</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               {/* way bill number */}
               <FormField
@@ -401,7 +442,7 @@ export function EditAnimalDialog({
                   <FormItem>
                     <FormLabel>Way Bill Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter way bill number" {...field} />
+                      <Input placeholder={getWayBillNumberPlaceholder(form.getValues("wayBillType") as WayBillType)} {...field} />
                     </FormControl>
                     <FormDescription>Way bill number</FormDescription>
                     <FormMessage />

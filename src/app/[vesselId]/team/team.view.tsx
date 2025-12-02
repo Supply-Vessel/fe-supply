@@ -1,14 +1,15 @@
 import {AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle} from "@/src/components/ui/alert-dialog";
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "@/src/components/ui/dialog";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/src/components/ui/select";
-import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar";
 import { Mail, Phone, Plus, Search, Trash2, UserPlus } from "lucide-react";
 import type { RequestEnums } from "@/src/components/requests/types";
-import { InitialMembersTypes, NewMemberTypes } from "./types";
+import { NewMemberTypes, VesselMembersTypes } from "./types";
 import { Card, CardContent } from "@/src/components/ui/card";
+import { getUserInitials } from "@/src/lib/getUserInitials";
 import { AccessStatus, Role } from "../../account/types";
 import type { Dispatch, SetStateAction } from "react";
 import { Button } from "@/src/components/ui/button";
+import { Avatar } from "@/src/components/ui/avatar";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import { Badge } from "@/src/components/ui/badge";
@@ -20,8 +21,8 @@ interface TeamViewProps {
     setSearchQuery: Dispatch<SetStateAction<string>>;
     setRoleFilter: Dispatch<SetStateAction<string>>;
     handleDeleteMember: (id: string) => void;
-    filteredMembers: InitialMembersTypes[];
-    members: InitialMembersTypes[];
+    filteredMembers: VesselMembersTypes[];
+    members: VesselMembersTypes[];
     isDeleteDialogOpen: boolean;
     handleAddMember: () => void;
     requestEnums: RequestEnums;
@@ -109,28 +110,15 @@ export default function TeamView (props: TeamViewProps) {
             </div>
     
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredMembers.map((member: InitialMembersTypes) => (
+            {filteredMembers.map((member: VesselMembersTypes) => (
                 <Card
                 key={member.id}
                 className={member.userId === userId ? "overflow-hidden hover:shadow-lg transition-shadow border-blue-600" : "overflow-hidden hover:shadow-lg transition-shadow"}
                 >
                 <CardContent className="p-6">
                     <div className="flex items-start justify-between mb-4">
-                        <Avatar className="h-16 w-16">
-                            <AvatarImage
-                                src={"/placeholder.svg"}
-                                alt={`${member.user.firstName} ${member.user.lastName}`}
-                            />
-                            <AvatarFallback className="bg-blue-100 text-blue-600 text-lg">
-                                {member.user.firstName
-                                    ?.split(" ")
-                                    .map((n) => n[0])
-                                    .join("") || ""}
-                                {member.user.lastName
-                                    ?.split(" ")
-                                    .map((n) => n[0])
-                                    .join("") || ""}
-                            </AvatarFallback>
+                        <Avatar className="h-16 w-16 bg-blue-600 text-white text-lg flex items-center justify-center font-semibold">
+                            {member && getUserInitials(member.user.firstName || "", member.user.lastName || "")}
                         </Avatar>
                         {(member.role !== Role.SUPPLIER && member?.userId !== userId && vesselOwner?.role === Role.SUPPLIER) &&
                             <Button

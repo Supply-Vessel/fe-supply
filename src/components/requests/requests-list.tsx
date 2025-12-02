@@ -4,15 +4,16 @@ import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, Pagi
 import { Request, RequestStatus, RequestType, PoStatus, TSIConfirm, PaymentStatus, type RequestEnums, type RequestPagination, WayBillType } from "./types"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
-import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/popover"
 import { LayoutGrid, LayoutList, Check, X, Plus, Link2, Plane, Package } from "lucide-react"
+import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/popover"
 import { Checkbox } from "@/src/components/ui/checkbox"
 import { useParams, useRouter } from "next/navigation"
+import { useState, useMemo, useEffect } from "react"
+import { useMediaQuery } from "../sidebar-provider"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
 import { Input } from "@/src/components/ui/input"
 import { Card } from "@/src/components/ui/card"
-import { useState, useMemo } from "react"
 import { toast } from "sonner"
 
 interface RequestsListProps {
@@ -77,10 +78,18 @@ export function RequestsList({requests, requestPagination, setPagination, handle
     storeLocation: true,
   })
   const [showColumnSelect, setShowColumnSelect] = useState(false)
-
+  const isMobile = useMediaQuery("(max-width: 768px)")
   const router = useRouter();
   const params = useParams();
   const {vesselId } = params;
+
+  useEffect(() => {
+    if (isMobile) {
+      setView("grid")
+    } else {
+      setView("table")
+    }
+  }, [isMobile])
   
   const currentRequests = requests
   const currentPage = requestPagination.currentPage
@@ -319,7 +328,7 @@ export function RequestsList({requests, requestPagination, setPagination, handle
     }
   }
 
-  const getWayBillNumberPlaceholder = (wayBillType?: WayBillType) => {
+  function getWayBillNumberPlaceholder(wayBillType?: WayBillType) {
     switch (wayBillType) {
       case WayBillType.AIR_WAYBILL:
         return "020-17363006"
@@ -371,7 +380,10 @@ export function RequestsList({requests, requestPagination, setPagination, handle
         return currentValue ? (
           <Badge
             variant="outline"
-            className={`${request.wayBillType === WayBillType.NO_WAYBILL && "opacity-50 cursor-not-allowed"} bg-blue-100 text-blue-800 hover:bg-blue-200 min-w-36 flex-nowrap flex gap-1 justify-center whitespace-nowrap cursor-pointer`}
+            className={`${request.wayBillType === WayBillType.NO_WAYBILL 
+              ? "opacity-50 cursor-not-allowed" 
+              : "bg-blue-100 text-blue-800 hover:bg-blue-200 min-w-36 flex-nowrap flex gap-1 justify-center whitespace-nowrap cursor-pointer"}`
+            }
             onClick={() => {
               if (request.wayBillType !== WayBillType.NO_WAYBILL) {
                 router.push(`/${vesselId}/requests/waybill/${currentValue}/${request.wayBillType}`)
@@ -597,7 +609,7 @@ export function RequestsList({requests, requestPagination, setPagination, handle
 
   return (
     <Card>
-      <div className="flex items-center justify-between border-b border-gray-200 p-4">
+      <div className="flex items-center flex-wrap gap-2 justify-between border-b border-gray-200 p-4">
         <div className="flex items-center gap-2">
           {/* <Checkbox checked={selectedRequests.length === filteredRequests.length && filteredRequests.length > 0} onCheckedChange={toggleAllRequests} />
           <span className="text-sm text-gray-500">{selectedRequests.length} selected</span> */}
@@ -605,7 +617,7 @@ export function RequestsList({requests, requestPagination, setPagination, handle
             {defaultType || "N/A"}
           </Badge>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Input
             placeholder="Filter requests..."
             value={searchQuery}
@@ -756,8 +768,8 @@ export function RequestsList({requests, requestPagination, setPagination, handle
       </div>
       
       {view === "table" ? (
-        <>
-          <Table>
+        <div className="grid grid-cols-1">
+          <Table className="overflow-x-auto">
             <TableHeader>
               <TableRow>
                 {/* <TableHead className="w-12"></TableHead> */}
@@ -987,7 +999,7 @@ export function RequestsList({requests, requestPagination, setPagination, handle
               </div>
             )}
           </div>
-        </>
+        </div>
       ) : (
         <>
           <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -997,10 +1009,10 @@ export function RequestsList({requests, requestPagination, setPagination, handle
                   <Badge variant="outline" className={getRequestTypeColor(defaultType)}>
                     {defaultType || "N/A"}
                   </Badge>
-                  <Checkbox
+                  {/* <Checkbox
                     checked={selectedRequests.includes(request.id || "")}
                     onCheckedChange={() => toggleRequestSelection(request.id || "")}
-                  />
+                  /> */}
                 </div>
 
                 <div className="flex-1 p-4 space-y-4">
@@ -1070,7 +1082,24 @@ export function RequestsList({requests, requestPagination, setPagination, handle
                       {request.wayBillNumber && (
                         <div className="flex items-start justify-between gap-2">
                           <span className="text-xs font-medium text-gray-500 flex-shrink-0">Way Bill No.:</span>
-                          <span className="text-xs text-gray-700 text-right break-all">{request.wayBillNumber}</span>
+                          <Badge
+                            variant="outline"
+                            className={`
+                              ${request.wayBillType === WayBillType.NO_WAYBILL
+                              ? "opacity-50 cursor-not-allowed" 
+                              : "bg-blue-100 text-blue-800 hover:bg-blue-200 min-w-36 flex-nowrap flex gap-1 justify-center whitespace-nowrap cursor-pointer"}`
+                            }
+                            onClick={() => {
+                              if (request.wayBillType !== WayBillType.NO_WAYBILL) {
+                                router.push(`/${vesselId}/requests/waybill/${request.wayBillNumber}/${request.wayBillType}`)
+                              }
+                          }}>
+                            {request.wayBillType !== WayBillType.NO_WAYBILL && (
+                              request.wayBillType === WayBillType.AIR_WAYBILL ? <Plane className="h-4 w-4" /> : <Package className="h-4 w-4" /> 
+                            )}
+                            {request.wayBillNumber as string}
+                            {request.wayBillType === WayBillType.NO_WAYBILL ? null : <Link2 className="h-4 w-4" />}
+                          </Badge>
                         </div>
                       )}
                     </div>

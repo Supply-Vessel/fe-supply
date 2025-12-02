@@ -1,5 +1,5 @@
-import type { AccessStatus, Role, Sex } from "../../account/types";
 import type { ActivityLevel, RecordType } from "../requests/types";
+import type { AccessStatus, Role } from "../../account/types";
 
 export interface VesselMembersTypes {
     id: string;
@@ -43,5 +43,4 @@ export interface RequestEnums {
     accessStatus: AccessStatus[]
     recordType: RecordType[];
     role: Role[];
-    sex: Sex[];
 }

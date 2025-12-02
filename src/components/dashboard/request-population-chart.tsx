@@ -53,7 +53,7 @@ function processRequestData(requests: Request[]): { chartData: any[], requestTyp
   }
   
   const chartData = dateRange.map(dateKey => {
-    const formattedDate = new Date(dateKey).toLocaleDateString('ru-RU', {
+    const formattedDate = new Date(dateKey).toLocaleDateString('en-US', {
       day: 'numeric',
       month: 'short'
     })
@@ -92,7 +92,7 @@ export function RequestPopulationChart({requests}: {requests: Request[]}) {
   return (
     <ChartContainer
       config={config}
-      className="h-[300px]"
+      className="h-[300px] [display: contents] w-full"
     >
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={chartData} margin={{ top: 5, right: 10, left: 10, bottom: 0 }}>

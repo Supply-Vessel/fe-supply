@@ -42,7 +42,7 @@ export function Header() {
                     <nav className="flex flex-col space-y-4">
                         <div className="flex flex-col space-y-2 px-4 pt-4 border-t border-gray-200">
                             <Button onClick={() => router.push("/signin")} variant="ghost" className="text-gray-600 hover:text-[#2563EB] justify-start">
-                                Sign In /<span className="text-[#2563EB]">Guest Access</span>
+                                <span className="text-[#2563EB]">Sign In</span>
                             </Button>
                             <Button onClick={() => router.push("/signup")} className="bg-[#2563EB] hover:bg-[#2563EB]/90 text-white justify-start">Sign Up</Button>
                         </div>

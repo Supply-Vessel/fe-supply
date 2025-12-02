@@ -50,10 +50,6 @@ export default function VesselsContainer({ userVessels }: VesselsContainerProps)
         }).format(dateObj);
     }, []);
 
-    const getInitials = useCallback((firstName: string, lastName: string) => {
-        return `${firstName.charAt(0)}${lastName.charAt(0)}`
-    }, []);
-
     const handleVesselClick = useCallback((vesselId: string) => {
         router.push(`/${vesselId}/dashboard`)
     }, [userInfo, router]);
@@ -74,7 +70,6 @@ export default function VesselsContainer({ userVessels }: VesselsContainerProps)
             handleJoinVessel={handleJoinVessel}
             filteredVessels={filteredVessels}
             setSearchTerm={setSearchTerm}
-            getInitials={getInitials}
             formatDate={formatDate}
             searchTerm={searchTerm}
             isLoading={isLoading}

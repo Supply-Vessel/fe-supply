@@ -1,10 +1,11 @@
 import { Building2, Plus, Users, Calendar, MapPin, Mail, User, ChevronRight, Search, BriefcaseBusiness } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Avatar, AvatarFallback } from "@/src/components/ui/avatar"
-import type { VesselsViewProps } from "./types"
+import { getUserInitials } from "@/src/lib/getUserInitials"
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Badge } from "@/src/components/ui/badge"
+import type { VesselsViewProps } from "./types"
 
 export default function VesselsView(
     {
@@ -13,7 +14,6 @@ export default function VesselsView(
         handleVesselClick,
         setSearchTerm,
         handleJoinVessel,
-        getInitials,
         formatDate,
         searchTerm,
         isLoading,
@@ -65,7 +65,7 @@ export default function VesselsView(
                         <div className="flex items-center space-x-4">
                             <Avatar className="h-16 w-16">
                                 <AvatarFallback className="bg-blue-600 text-white text-lg font-semibold">
-                                {userInfo && getInitials(userInfo.firstName || "", userInfo.lastName || "")}
+                                {userInfo && getUserInitials(userInfo.firstName || "", userInfo.lastName || "")}
                                 </AvatarFallback>
                             </Avatar>
 

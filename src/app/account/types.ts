@@ -36,12 +36,11 @@ export interface VesselsContainerProps {
 }
 
 export interface VesselsViewProps {
-    getInitials: (firstName: string, lastName: string) => string;
     setSearchTerm: React.Dispatch<SetStateAction<string>>;
-    formatDate: (date: Date | string) => string
-    filteredVessels: Vessel[] | [];
     handleVesselClick: (vesselId: string) => void;
+    formatDate: (date: Date | string) => string
     handleCreateVessel: VoidFunction;
+    filteredVessels: Vessel[] | [];
     handleJoinVessel: VoidFunction;
     userInfo: UserInfo | null;
     isLoading: boolean;
