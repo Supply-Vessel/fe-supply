@@ -30,7 +30,10 @@ export interface VesselMembersTypes {
 export interface NewMemberTypes {
     email: string;
     role: string;
+    orgRole: string; // Role in organization (ADMIN, MANAGER, MEMBER)
 }
+
+export type InitialMembersTypes = VesselMembersTypes;
 
 export interface VesselMembersResponse {
     success: boolean;

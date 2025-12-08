@@ -1,3 +1,14 @@
+// ===================================================================
+// НОВАЯ АРХИТЕКТУРА PRISMA SCHEMA
+// ===================================================================
+// Эта схема вводит разделение на:
+// 1. Organization (Компании) - платящие клиенты
+// 2. Organization Owners - владельцы компаний (создатели)
+// 3. Regular Users - приглашенные сотрудники
+// 
+// НЕ ПРИМЕНЯТЬ СРАЗУ! Требуется миграция данных.
+// ===================================================================
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,6 +19,138 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+// ===================================================================
+// НОВЫЕ МОДЕЛИ - ОРГАНИЗАЦИИ
+// ===================================================================
+
+model Organization {
+  id            String                @id @default(uuid())
+  name          String                @unique
+  description   String?
+  ownerId       String                // Владелец компании (платит)
+  type          OrganizationType      @default(COMPANY)
+  isActive      Boolean               @default(true)
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+  
+  // Отношения
+  owner         User                  @relation("OrganizationOwner", fields: [ownerId], references: [id])
+  vessels       Vessel[]              // Корабли принадлежат организации
+  members       OrganizationMember[]  // Члены организации
+  subscriptions Subscription[]        // Подписки на уровне организации
+  invitations   Invitation[]
+  
+  @@index([ownerId])
+  @@index([isActive])
+}
+
+model OrganizationMember {
+  id             String       @id @default(uuid())
+  userId         String
+  organizationId String
+  role           OrgRole      @default(MEMBER)
+  invitedBy      String?      // ID пользователя, который пригласил
+  status         MemberStatus @default(ACTIVE)
+  joinedAt       DateTime     @default(now())
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, organizationId])
+  @@index([organizationId])
+  @@index([userId])
+}
+
+// ===================================================================
+// ОБНОВЛЕННАЯ МОДЕЛЬ USER
+// ===================================================================
+
+model User {
+  id                      String                @id @default(uuid())
+  email                   String                @unique
+  address                 String?
+  contactPhone            String?
+  firstName               String?
+  lastName                String?
+  institution             String?
+  password                String
+  confirmedEmail          Boolean               @default(false)
+  userType                UserType              @default(REGULAR) // NEW: тип пользователя
+  createdAt               DateTime              @default(now())
+  updatedAt               DateTime              @updatedAt
+  
+  // Существующие отношения
+  notifications           Notification[]
+  tasks                   Task[]
+  vessels                 UserVessel[]
+  invitations             Invitation[]          @relation("UserInvitations")
+  
+  // NEW: Отношения с организациями
+  ownedOrganizations      Organization[]        @relation("OrganizationOwner") // Компании, которыми владеет
+  organizationMemberships OrganizationMember[]  // Компании, в которых состоит как member
+  
+  @@index([email])
+  @@index([userType])
+}
+
+// ===================================================================
+// ОБНОВЛЕННАЯ МОДЕЛЬ VESSEL
+// ===================================================================
+
+model Vessel {
+  id              String         @id @default(uuid())
+  name            String
+  organizationId  String         // NEW: привязка к организации
+  username        String
+  position        Role           @default(SUPPLIER)
+  description     String?
+  isActive        Boolean        @default(true) // NEW: можно деактивировать корабль
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  requests        Request[]
+  users           UserVessel[]
+  invitations     Invitation[]   @relation("VesselInvitations")
+  tasks           Task[]
+  
+  @@index([organizationId])
+  @@index([isActive])
+}
+
+// ===================================================================
+// ОБНОВЛЕННАЯ МОДЕЛЬ SUBSCRIPTION (на уровне организации)
+// ===================================================================
+
+model Subscription {
+  id              String             @id @default(uuid())
+  organizationId  String             // Изменено с vesselId
+  planId          String
+  startDate       DateTime
+  endDate         DateTime
+  status          SubscriptionStatus
+  maxUsers        Int                // Лимит пользователей
+  maxVessels      Int?               // NEW: лимит кораблей
+  paymentMethod   String?
+  autoRenew       Boolean            @default(true)
+  trialEndsAt     DateTime?          // NEW: дата окончания триала
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  
+  payments        Payment[]
+  organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan            Plan               @relation(fields: [planId], references: [id])
+  
+  @@index([organizationId])
+  @@index([status])
+}
+
+// ===================================================================
+// ОБНОВЛЕННАЯ МОДЕЛЬ PLAN
+// ===================================================================
+
 model Plan {
   id            String         @id @default(uuid())
   name          String
@@ -15,31 +158,15 @@ model Plan {
   price         Float
   currency      String         @default("CAD")
   billingCycle  BillingCycle
-  maxUsers      Int
+  maxUsers      Int            // Максимум пользователей в плане
+  maxVessels    Int?           // NEW: Максимум кораблей в плане
   features      Json?
   isActive      Boolean        @default(true)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   subscriptions Subscription[]
-}
-
-model Subscription {
-  id            String             @id @default(uuid())
-  vesselId      String
-  planId        String
-  startDate     DateTime
-  endDate       DateTime
-  status        SubscriptionStatus
-  maxUsers      Int
-  paymentMethod String?
-  autoRenew     Boolean            @default(true)
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
-  payments      Payment[]
-  vessel        Vessel             @relation(fields: [vesselId], references: [id], onDelete: Cascade)
-  plan          Plan               @relation(fields: [planId], references: [id])
-
-  @@index([vesselId])
+  
+  @@index([isActive])
 }
 
 model Payment {
@@ -58,42 +185,35 @@ model Payment {
   subscription   Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
 
   @@index([subscriptionId])
+  @@index([status])
 }
 
-model Vessel {
-  id            String         @id @default(uuid())
-  name          String
-  username      String
-  position      Role           @default(SUPPLIER)
-  description   String?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  requests      Request[]
-  experiments   Experiment[]
-  subscriptions Subscription[]
-  users         UserVessel[]
-  invitations   Invitation[]   @relation("VesselInvitations")
-  tasks         Task[]
-}
+// ===================================================================
+// ОБНОВЛЕННАЯ МОДЕЛЬ INVITATION
+// ===================================================================
 
-model User {
-  id             String          @id @default(uuid())
-  email          String          @unique
-  address        String?
-  contactPhone   String?
-  firstName      String?
-  lastName       String?
-  institution    String?
-  password       String
-  confirmedEmail Boolean         @default(false)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  requestRecords RequestRecord[]
-  experiments    Experiment[]
-  notifications  Notification[]
-  tasks          Task[]
-  vessels        UserVessel[]
-  invitations    Invitation[]    @relation("UserInvitations")
+model Invitation {
+  id              String           @id @default(uuid())
+  email           String
+  code            String
+  organizationId  String           // NEW: приглашение в организацию
+  vesselId        String?          // Опционально - конкретный корабль
+  invitedBy       String
+  role            Role             @default(SUPPLIER)
+  orgRole         OrgRole?         // NEW: роль в организации
+  token           String           @unique
+  expiresAt       DateTime
+  status          InvitationStatus @default(PENDING)
+  createdAt       DateTime         @default(now())
+  usedAt          DateTime?
+  
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  vessel          Vessel?          @relation("VesselInvitations", fields: [vesselId], references: [id], onDelete: Cascade)
+  inviter         User             @relation("UserInvitations", fields: [invitedBy], references: [id])
+  
+  @@unique([email, organizationId])
+  @@index([organizationId])
+  @@index([status])
 }
 
 model UserVessel {
@@ -112,24 +232,8 @@ model UserVessel {
   user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, vesselId])
-}
-
-model Invitation {
-  id        String           @id @default(uuid())
-  email     String
-  code      String
-  vesselId  String
-  invitedBy String
-  role      Role             @default(SUPPLIER)
-  token     String           @unique
-  expiresAt DateTime
-  status    InvitationStatus @default(PENDING)
-  createdAt DateTime         @default(now())
-  usedAt    DateTime?
-  vessel    Vessel           @relation("VesselInvitations", fields: [vesselId], references: [id], onDelete: Cascade)
-  inviter   User             @relation("UserInvitations", fields: [invitedBy], references: [id])
-
-  @@unique([email, vesselId])
+  @@index([userId])
+  @@index([vesselId])
 }
 
 model VerificationCode {
@@ -138,22 +242,13 @@ model VerificationCode {
   code      String
   expiresAt DateTime
   createdAt DateTime @default(now())
+  
+  @@index([email])
 }
 
-model CustomField {
-  id           String             @id @default(uuid())
-  name         String
-  fieldType    FieldType
-  isRequired   Boolean            @default(false)
-  defaultValue String?
-  description  String?
-  requestType  RequestType
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
-  customValues CustomFieldValue[]
-
-  @@unique([name, requestType])
-}
+// ===================================================================
+// ОСТАЛЬНЫЕ МОДЕЛИ (БЕЗ ИЗМЕНЕНИЙ)
+// ===================================================================
 
 model Request {
   id             String             @id @default(uuid())
@@ -163,10 +258,10 @@ model Request {
   poNumber       String?
   paymentStatus  PaymentStatus?     @default(CREDIT_NOT_PAID)
   description    String?
+  wayBillType    WayBillType?       @default(NO_WAYBILL)
   wayBillNumber  String?
-  wayBillType    WayBillType?      @default(NO_WAYBILL)
   storeLocation  String?
-  status         RequestStatus      @default(ON_HOLD)
+  status         RequestStatus      @default(WAITING)
   offerNumber    String?
   companyOfOrder String?
   countryOfOrder String?
@@ -174,128 +269,14 @@ model Request {
   vesselId       String
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
+  
   vessel         Vessel             @relation(fields: [vesselId], references: [id])
-  records        RequestRecord[]
-  customFields   CustomFieldValue[]
-
+  
   @@unique([identifier, vesselId])
+  @@index([vesselId])
+  @@index([status])
 }
 
-model CustomFieldValue {
-  id            String      @id @default(uuid())
-  value         String
-  requestId     String
-  customFieldId String
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  request       Request     @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  customField   CustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
-
-  @@unique([requestId, customFieldId])
-}
-
-model RequestRecord {
-  id            String         @id @default(uuid())
-  requestId     String
-  recordType    RecordType
-  date          DateTime       @default(now())
-  createdById   String
-  temperature   Float?
-  weight        Float?
-  feedIntake    Float?
-  waterIntake   Float?
-  activityLevel ActivityLevel?
-  notes         String?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  request       Request        @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  createdBy     User           @relation(fields: [createdById], references: [id])
-  measurements  Measurement[]
-  photos        RecordPhoto[]
-}
-
-model Measurement {
-  id        String        @id @default(uuid())
-  recordId  String
-  parameter String
-  value     Float
-  unit      String?
-  createdAt DateTime      @default(now())
-  record    RequestRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
-}
-
-model RecordPhoto {
-  id        String        @id @default(uuid())
-  recordId  String
-  imageUrl  String
-  caption   String?
-  createdAt DateTime      @default(now())
-  record    RequestRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
-}
-
-model AnimalPhoto {
-  id        String   @id @default(uuid())
-  requestId String
-  imageUrl  String
-  caption   String?
-  isMain    Boolean  @default(false)
-  createdAt DateTime @default(now())
-}
-
-model Breeding {
-  id         String            @id @default(uuid())
-  motherId   String
-  fatherId   String
-  protocolId String?
-  startDate  DateTime
-  endDate    DateTime?
-  status     BreedingStatus    @default(ACTIVE)
-  notes      String?
-  createdAt  DateTime          @default(now())
-  updatedAt  DateTime          @updatedAt
-  protocol   BreedingProtocol? @relation(fields: [protocolId], references: [id])
-}
-
-model BreedingProtocol {
-  id           String      @id @default(uuid())
-  name         String
-  requestType  RequestType
-  description  String?
-  instructions String?
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  breedings    Breeding[]
-}
-
-model Experiment {
-  id          String             @id @default(uuid())
-  title       String
-  description String?
-  vesselId    String
-  startDate   DateTime
-  endDate     DateTime?
-  status      ExperimentStatus   @default(PLANNED)
-  createdById String
-  protocol    String?
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-  createdBy   User               @relation(fields: [createdById], references: [id])
-  vessel      Vessel             @relation(fields: [vesselId], references: [id])
-  animals     ExperimentAnimal[]
-  tasks       Task[]
-}
-
-model ExperimentAnimal {
-  id           String     @id @default(uuid())
-  experimentId String
-  requestId    String
-  notes        String?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  experiment   Experiment @relation(fields: [experimentId], references: [id], onDelete: Cascade)
-
-  @@unique([experimentId, requestId])
-}
 
 model Task {
   id           String       @id @default(uuid())
@@ -303,7 +284,6 @@ model Task {
   description  String?
   vesselId     String
   assignedToId String
-  experimentId String?
   dueDate      DateTime?
   vessel       Vessel       @relation(fields: [vesselId], references: [id])
   status       TaskStatus   @default(PENDING)
@@ -311,7 +291,9 @@ model Task {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   assignedTo   User         @relation(fields: [assignedToId], references: [id])
-  experiment   Experiment?  @relation(fields: [experimentId], references: [id])
+  
+  @@index([vesselId])
+  @@index([assignedToId])
 }
 
 model Notification {
@@ -323,8 +305,40 @@ model Notification {
   type      NotificationType
   createdAt DateTime         @default(now())
   user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([isRead])
 }
 
+// ===================================================================
+// ENUMS
+// ===================================================================
+
+// NEW ENUMS
+enum UserType {
+  ORGANIZATION_OWNER  // Владелец организации (платит за подписку)
+  REGULAR             // Обычный пользователь (приглашенный)
+}
+
+enum OrganizationType {
+  COMPANY             // Компания
+  INDIVIDUAL          // Индивидуальный предприниматель
+}
+
+enum OrgRole {
+  ADMIN               // Администратор организации (полный доступ)
+  MANAGER             // Менеджер (управление пользователями и кораблями)
+  MEMBER              // Обычный член (только доступ к назначенным кораблям)
+}
+
+enum MemberStatus {
+  ACTIVE              // Активный член
+  SUSPENDED           // Приостановлен
+  INVITED             // Приглашен, но еще не присоединился
+  REMOVED             // Удален из организации
+}
+
+// EXISTING ENUMS
 enum BillingCycle {
   MONTHLY
   YEARLY
@@ -395,15 +409,15 @@ enum RequestStatus {
   CANCELLED
 }
 
+enum PoStatus {
+  WITHOUT_PO
+  PO_DONE
+}
+
 enum RequestType {
   ENGINE
   ELECTRICAL
   DECK
-}
-
-enum PoStatus {
-  WITHOUT_PO
-  PO_DONE
 }
 
 enum RecordType {

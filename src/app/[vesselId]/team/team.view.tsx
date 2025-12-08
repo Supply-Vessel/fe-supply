@@ -218,36 +218,58 @@ export default function TeamView (props: TeamViewProps) {
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                     <div className="grid gap-2">
-                        <Label htmlFor="role">Role *</Label>
-                        <Select
-                            value={newMember.role}
-                            onValueChange={(value) =>
-                                setNewMember({ ...newMember, role: value })
-                            }
-                        >
-                        <SelectTrigger id="role">
-                            <SelectValue placeholder="Select role" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {requestEnums?.role?.map((role) => (
-                                <SelectItem key={role} value={role}>
-                                    {role}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="grid gap-2">
                         <Label htmlFor="email">Email *</Label>
                         <Input
-                        id="email"
-                        type="email"
-                        placeholder="john.smith@labassist.com"
-                        value={newMember.email}
-                        onChange={(e) =>
-                            setNewMember({ ...newMember, email: e.target.value })
-                        }
+                            id="email"
+                            type="email"
+                            placeholder="john.smith@company.com"
+                            value={newMember.email}
+                            onChange={(e) =>
+                                setNewMember({ ...newMember, email: e.target.value })
+                            }
                         />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="orgRole">Organization Role *</Label>
+                            <Select
+                                value={newMember.orgRole || "MEMBER"}
+                                onValueChange={(value) =>
+                                    setNewMember({ ...newMember, orgRole: value })
+                                }
+                            >
+                                <SelectTrigger id="orgRole">
+                                    <SelectValue placeholder="Select org role" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="ADMIN">Admin</SelectItem>
+                                    <SelectItem value="MANAGER">Manager</SelectItem>
+                                    <SelectItem value="MEMBER">Member</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <p className="text-xs text-gray-500">Role in the organization</p>
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="role">Vessel Role *</Label>
+                            <Select
+                                value={newMember.role}
+                                onValueChange={(value) =>
+                                    setNewMember({ ...newMember, role: value })
+                                }
+                            >
+                                <SelectTrigger id="role">
+                                    <SelectValue placeholder="Select role" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {requestEnums?.role?.map((role) => (
+                                        <SelectItem key={role} value={role}>
+                                            {role}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <p className="text-xs text-gray-500">Role on this vessel</p>
+                        </div>
                     </div>
                 </div>
                 <DialogFooter>

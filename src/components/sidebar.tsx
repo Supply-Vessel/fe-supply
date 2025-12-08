@@ -4,6 +4,7 @@ import { useParams, usePathname, useRouter } from "next/navigation"
 import { useSidebar } from "@/src/components/sidebar-provider"
 import { ScrollArea } from "@/src/components/ui/scroll-area"
 import { Button } from "@/src/components/ui/button"
+import { AuthService } from "../lib/auth"
 import { cn } from "@/src/lib/utils"
 import type React from "react"
 import Link from "next/link"
@@ -20,12 +21,12 @@ import {
 export function Sidebar() {
   const { isOpen, toggle } = useSidebar();
   const params = useParams();
-  const { userId,vesselId } = params;
+  const { userId, vesselId } = params;
   const pathname = usePathname();
   const router = useRouter();
 
   const handleLogOut = () => {
-    router.replace('/');
+    AuthService.logout();
   }
 
   return (

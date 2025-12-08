@@ -1,9 +1,46 @@
-import { Role, AccessStatus, ExperimentStatus, RequestStatus } from "@prisma/client"
+import { Role, AccessStatus, ExperimentStatus, RequestStatus, UserType, OrgRole, MemberStatus } from "@prisma/client"
 import type { SetStateAction } from "react"
 
 // Re-export Prisma enums for convenience
-export { Role, AccessStatus, ExperimentStatus, RequestStatus }
+export { Role, AccessStatus, ExperimentStatus, RequestStatus, UserType, OrgRole, MemberStatus }
 
+// Organization types
+export interface OrganizationOwner {
+    id: string;
+    firstName: string | null;
+    lastName: string | null;
+    email: string;
+}
+
+export interface OrganizationStats {
+    membersCount: number;
+    vesselsCount: number;
+}
+
+export interface OrganizationSubscription {
+    id: string;
+    planName: string;
+    status: string;
+    maxUsers: number;
+    maxVessels: number | null;
+    endDate: Date;
+}
+
+export interface Organization {
+    id: string;
+    name: string;
+    description: string | null;
+    type: string;
+    isOwner: boolean;
+    memberRole: OrgRole;
+    memberStatus: MemberStatus;
+    joinedAt: Date;
+    owner: OrganizationOwner;
+    stats: OrganizationStats;
+    subscription: OrganizationSubscription | null;
+}
+
+// Vessel types
 export interface Vessel {
     id: string
     createdAt: Date
@@ -17,8 +54,11 @@ export interface Vessel {
     position: Role
     description: string | null
     userRole: Role
+    organizationId?: string
+    organizationName?: string
 }
 
+// User types
 export interface UserInfo {
     userId: string
     confirmedEmail: boolean
@@ -29,22 +69,51 @@ export interface UserInfo {
     lastName: string | null
     address: string | null
     email: string
+    userType?: UserType
 }
 
+// API response type
+export interface AccountData {
+    userType: UserType;
+    organizations: Organization[];
+    vessels: Vessel[];
+}
+
+// Container props
 export interface VesselsContainerProps {
-    userVessels: Vessel[];
+    accountData: AccountData;
 }
 
+// Invite form data
+export interface InviteMemberForm {
+    email: string;
+    organizationId: string;
+    orgRole: string;
+}
+
+// View props
 export interface VesselsViewProps {
     setSearchTerm: React.Dispatch<SetStateAction<string>>;
     handleVesselClick: (vesselId: string) => void;
-    formatDate: (date: Date | string) => string
+    handleInviteMember: (formData: InviteMemberForm) => Promise<void>;
+    formatDate: (date: Date | string) => string;
     handleCreateVessel: VoidFunction;
-    filteredVessels: Vessel[] | [];
-    handleJoinVessel: VoidFunction;
+    filteredVessels: Vessel[];
     userInfo: UserInfo | null;
     isLoading: boolean;
     searchTerm: string;
+    // Organization support
+    organizations: Organization[];
+    userType: UserType | null;
+    canCreateVessel: boolean;
+    canInviteMembers: boolean;
+    isInviteDialogOpen: boolean;
+    setIsInviteDialogOpen: (isOpen: boolean) => void;
+    inviteForm: InviteMemberForm;
+    setInviteForm: (form: InviteMemberForm) => void;
+    isInviting: boolean;
+    handleInviteSubmit: () => void;
+    handleLogout: () => void;
 }
 
 export interface PageProps {

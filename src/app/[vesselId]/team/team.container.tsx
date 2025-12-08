@@ -26,6 +26,7 @@ export default function TeamContainer(props: TeamContainerProps) {
     const [newMember, setNewMember] = useState({
         email: "",
         role: "",
+        orgRole: "MEMBER",
     });
 
   // Filter members based on search query and filters
@@ -49,26 +50,28 @@ export default function TeamContainer(props: TeamContainerProps) {
         const member = {
           email: newMember.email,
           role: newMember.role,
+          orgRole: newMember.orgRole || "MEMBER",
           invitedBy: userId,
-         vesselId:vesselId,
+          vesselId: vesselId,
         };
 
         const response = await apiClient.post("/api/invitation", member);
-        toast(response.message || response.error, {
-          description: ``
+        toast(response.success ? "Success" : "Error", {
+          description: response.message || response.error
         });
         if(response.success) {
           setIsAddDialogOpen(false);
           setNewMember({
             role: "",
             email: "",
+            orgRole: "MEMBER",
           });
         }
       }
     } catch (error) {
       console.error("Failed to create Invitation:", error)
     }
-  }, [newMember, userId,vesselId])
+  }, [newMember, userId, vesselId])
 
   // Handle delete member
   const handleDeleteMember = (id: string) => {

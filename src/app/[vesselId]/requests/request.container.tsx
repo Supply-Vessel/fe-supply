@@ -1,10 +1,10 @@
 "use client";
 
 import { Request, RequestPagination, RequestEnums, RequestType } from "@/src/components/requests/types";
-import { AnimalsHeader } from "@/src/components/requests/animals-header";
+import { RequestsHeader } from "@/src/components/requests/requests-header";
 import { RequestsTabs } from "@/src/components/requests/requests-tabs";
-import { useCallback, useState } from "react";
 import { apiClient } from "@/src/lib/apiClient";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
 interface RequestPropsType {
@@ -147,8 +147,7 @@ const RequestsContainer = (props: RequestPropsType) => {
 
     return (
         <div className="space-y-6">
-            <AnimalsHeader
-            />
+            <RequestsHeader />
             <RequestsTabs
                 handleUpdateDataPagination={handleUpdateDataPagination}
                 setElectricPagination={setElectricPagination}

@@ -14,11 +14,11 @@ export default async function TeamPage({params}: TeamPageTypes) {
   const cookieStore = await cookies();
   const userId = await cookieStore.get('USER_ID')?.value || 'default';
   const requestEnums = await apiClient.get(`${process.env.NEXT_PUBLIC_ABSOLUTE_URL}/api/requests/enums`);
-  const laboratoryMembers = await apiClient.get(`${process.env.NEXT_PUBLIC_ABSOLUTE_URL}/api/vessel/${userId}/${vesselId}`);
+  const vesselMembers = await apiClient.get(`${process.env.NEXT_PUBLIC_ABSOLUTE_URL}/api/vessel/${userId}/${vesselId}`);
 
   return (
     <TeamContainer
-      initialMembers={laboratoryMembers.data}
+      initialMembers={vesselMembers.data}
       requestEnums={requestEnums.data}
       vesselId={vesselId}
       userId={userId}
