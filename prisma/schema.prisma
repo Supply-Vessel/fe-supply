@@ -113,6 +113,7 @@ model Vessel {
   organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   requests        Request[]
   users           UserVessel[]
+  requestTypes    RequestTypeModel[]
   invitations     Invitation[]   @relation("VesselInvitations")
   tasks           Task[]
   
@@ -265,18 +266,34 @@ model Request {
   offerNumber    String?
   companyOfOrder String?
   countryOfOrder String?
-  requestType    RequestType        @default(ENGINE)
+  requestTypeId  String
   vesselId       String
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
-  
+  requestType    RequestTypeModel   @relation(fields: [requestTypeId], references: [id])
   vessel         Vessel             @relation(fields: [vesselId], references: [id])
   
-  @@unique([identifier, vesselId])
+  @@unique([identifier, vesselId, requestTypeId])
   @@index([vesselId])
   @@index([status])
 }
 
+model RequestTypeModel {
+  id          String   @id @default(uuid())
+  name        String   // например "ENGINE", "ELECTRICAL", "DECK"
+  displayName String   // для отображения: "Engine", "Electrical", "Deck"
+  description String?
+  color       String?  // опционально: цвет для UI
+  vesselId    String
+  isDefault   Boolean  @default(false) // можно пометить типы по умолчанию
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  vessel      Vessel   @relation(fields: [vesselId], references: [id], onDelete: Cascade)
+  requests    Request[]
+
+  @@unique([name, vesselId]) // уникальное имя типа для каждого судна
+  @@index([vesselId])
+}
 
 model Task {
   id           String       @id @default(uuid())
@@ -412,12 +429,6 @@ enum RequestStatus {
 enum PoStatus {
   WITHOUT_PO
   PO_DONE
-}
-
-enum RequestType {
-  ENGINE
-  ELECTRICAL
-  DECK
 }
 
 enum RecordType {

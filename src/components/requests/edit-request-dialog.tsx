@@ -1,7 +1,7 @@
 "use client"
 
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/src/components/ui/form"
-import { RequestStatus, RequestType, PaymentStatus, TSIConfirm, PoStatus, type RequestEnums, type Request, WayBillType } from "./types"
+import { RequestStatus, PaymentStatus, TSIConfirm, PoStatus, type RequestEnums, type Request, WayBillType, type RequestTypeModel } from "./types"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/src/components/ui/button"
@@ -22,12 +22,12 @@ import {
 
 const formSchema = z.object({
     id: z.string().min(1, "Id is required"),
-    identifier: z.string().min(1, "Identifier is required").max(50, "Identifier must be less than 5 characters"),
+    identifier: z.string().min(1, "Identifier is required").max(50, "Identifier must be less than 50 characters"),
     description: z.string().optional(),
     wayBillType: z.nativeEnum(WayBillType).default(WayBillType.NO_WAYBILL),
     wayBillNumber: z.string().optional(),
     storeLocation: z.string().optional(),
-    requestType: z.nativeEnum(RequestType),
+    requestTypeId: z.string().min(1, "Request type is required"),
     poStatus: z.nativeEnum(PoStatus).optional(),
     tsiConfirm: z.nativeEnum(TSIConfirm).optional(),
     paymentStatus: z.nativeEnum(PaymentStatus).optional(),
@@ -38,15 +38,16 @@ const formSchema = z.object({
     vesselId: z.string().min(1, "Vessel id is required"),
 })
 
-  interface EditAnimalDialogProps {
+interface EditAnimalDialogProps {
     onSubmit: (request: Partial<Request>) => Promise<void>
     setOpen: (open: boolean) => void
     selectedRequest: Request | null
     requestEnums: RequestEnums
+    requestTypes?: RequestTypeModel[]
     loadingButtonText: string
     submitButtonText: string
     userId: string
-   vesselId: string
+    vesselId: string
     open: boolean
 }
 
@@ -66,25 +67,25 @@ export function EditAnimalDialog({
     submitButtonText,
     selectedRequest,
     requestEnums,
+    requestTypes = [],
     onSubmit,
     setOpen,
-   vesselId,
+    vesselId,
     open,
 }: EditAnimalDialogProps) {
     const [isSubmitting, setIsSubmitting] = useState(false)
-    console.log(selectedRequest);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-        vesselId:vesselId,
+        vesselId: vesselId,
         status: RequestStatus.WAITING,
         identifier: "",
         description: "",
         wayBillType: WayBillType.NO_WAYBILL,
         wayBillNumber: "",
         storeLocation: "",
-        requestType: undefined,
+        requestTypeId: "",
         poStatus: undefined,
         tsiConfirm: undefined,
         paymentStatus: undefined,
@@ -98,13 +99,13 @@ export function EditAnimalDialog({
     if (selectedRequest) {
       form.reset({
         id: selectedRequest?.id,
-        vesselId:vesselId,
+        vesselId: vesselId,
         identifier: selectedRequest?.identifier || "",
         description: selectedRequest?.description || "",
         wayBillType: selectedRequest?.wayBillType || WayBillType.NO_WAYBILL,
         wayBillNumber: selectedRequest?.wayBillNumber || "",
         storeLocation: selectedRequest?.storeLocation || "",
-        requestType: selectedRequest?.requestType || undefined,
+        requestTypeId: selectedRequest?.requestTypeId || "",
         poStatus: selectedRequest?.poStatus || undefined,
         tsiConfirm: selectedRequest?.tsiConfirm || undefined,
         paymentStatus: selectedRequest?.paymentStatus || undefined,
@@ -115,14 +116,14 @@ export function EditAnimalDialog({
       })
     } else {
       form.reset({
-        vesselId:vesselId,
+        vesselId: vesselId,
         status: RequestStatus.WAITING,
         identifier: "",
         description: "",
         wayBillType: WayBillType.NO_WAYBILL,
         wayBillNumber: "",
         storeLocation: "",
-        requestType: undefined,
+        requestTypeId: "",
         poStatus: undefined,
         tsiConfirm: undefined,
         paymentStatus: undefined,
@@ -131,7 +132,7 @@ export function EditAnimalDialog({
         countryOfOrder: "",
       })
     }
-  }, [selectedRequest]);
+  }, [selectedRequest, vesselId, form]);
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true)
@@ -140,7 +141,7 @@ export function EditAnimalDialog({
       form.reset()
       setOpen(false)
     } catch (error) {
-      console.error("Error adding animal:", error)
+      console.error("Error editing request:", error)
     } finally {
       setIsSubmitting(false)
     }
@@ -154,7 +155,6 @@ export function EditAnimalDialog({
         className="max-w-2xl max-h-[90vh] overflow-y-auto" 
         id="edit-request-dialog"
         onInteractOutside={(e) => {
-          // Предотвращаем закрытие диалога при клике на Select dropdown
           const target = e.target as Element
           if (target && target.closest('[data-radix-select-content]')) {
             e.preventDefault()
@@ -190,25 +190,33 @@ export function EditAnimalDialog({
               {/* Request Type */}
               <FormField
                 control={form.control}
-                name="requestType"
+                name="requestTypeId"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Request Type *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select request type" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {requestEnums.requestType.length === 0 ? (
+                        {requestTypes.length === 0 ? (
                           <div className="p-2 text-center text-sm text-gray-500">
                             No request types found
                           </div>
                         ) : (
-                          requestEnums.requestType.map((type: RequestType) => (
-                            <SelectItem key={type} value={type}>
-                              {type}
+                          requestTypes.map((type) => (
+                            <SelectItem key={type.id} value={type.id}>
+                              <div className="flex items-center gap-2">
+                                {type.color && (
+                                  <span
+                                    className="w-2 h-2 rounded-full"
+                                    style={{ backgroundColor: type.color }}
+                                  />
+                                )}
+                                {type.displayName}
+                              </div>
                             </SelectItem>
                           ))
                         )}
@@ -234,7 +242,7 @@ export function EditAnimalDialog({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {requestEnums.poStatus.map((poStatus: PoStatus) => (
+                        {requestEnums.poStatus.map((poStatus) => (
                           <SelectItem key={poStatus} value={poStatus}>
                             {poStatus}
                           </SelectItem>
@@ -277,7 +285,7 @@ export function EditAnimalDialog({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {requestEnums.paymentStatus.map((paymentStatus: PaymentStatus) => (
+                        {requestEnums.paymentStatus.map((paymentStatus) => (
                           <SelectItem key={paymentStatus} value={paymentStatus}>
                             {paymentStatus}
                           </SelectItem>
@@ -320,7 +328,7 @@ export function EditAnimalDialog({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {requestEnums.requestStatus.map((requestStatus: RequestStatus) => (
+                        {requestEnums.requestStatus.map((requestStatus) => (
                           <SelectItem key={requestStatus} value={requestStatus}>
                             {requestStatus}
                           </SelectItem>
@@ -347,7 +355,7 @@ export function EditAnimalDialog({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {requestEnums.tsiConfirm.map((tsiConfirm: TSIConfirm) => (
+                        {requestEnums.tsiConfirm.map((tsiConfirm) => (
                           <SelectItem key={tsiConfirm} value={tsiConfirm}>
                             {tsiConfirm}
                           </SelectItem>

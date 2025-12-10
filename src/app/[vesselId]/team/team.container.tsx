@@ -1,22 +1,26 @@
 "use client";
 
 import type { RequestEnums } from "@/src/components/requests/types";
+import { OrgRole, type UserType } from "@prisma/client";
+import type { Organization } from "../../account/types";
+import { useCallback, useMemo, useState } from "react";
 import type { InitialMembersTypes } from "./types";
 import { apiClient } from "@/src/lib/apiClient";
-import { useCallback, useState } from "react";
 import TeamView from "./team.view";
 import { toast } from "sonner";
 
 interface TeamContainerProps{
+    organizationMembers: Organization[],
     initialMembers: InitialMembersTypes[],
     requestEnums: RequestEnums,
+    userType: UserType,
+    vesselId: string,
     userId: string,
-   vesselId: string,
 }
 
 export default function TeamContainer(props: TeamContainerProps) {
-    const {initialMembers, requestEnums, userId,vesselId} = props;
-
+    const {initialMembers, requestEnums, userId,vesselId, userType, organizationMembers} = props;
+    const [organizations, setOrganizations] = useState<Organization[]>(organizationMembers || [])
     const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -42,6 +46,14 @@ export default function TeamContainer(props: TeamContainerProps) {
 
     return matchesSearch && matchesRole;
   });
+
+  const canInviteMembers = useMemo(() => {
+    if (userType === 'ORGANIZATION_OWNER') return true;
+    
+    return organizations.some(org => 
+      org.memberRole === 'ADMIN' || org.memberRole === 'MANAGER'
+  );
+}, [userType, organizations]);
 
   // Handle add member
   const handleAddMember = useCallback(async () => {
@@ -108,6 +120,7 @@ export default function TeamContainer(props: TeamContainerProps) {
             setIsAddDialogOpen={setIsAddDialogOpen}
             handleDeleteMember={handleDeleteMember}
             isDeleteDialogOpen={isDeleteDialogOpen}
+            canInviteMembers={canInviteMembers}
             isAddDialogOpen={isAddDialogOpen}
             filteredMembers={filteredMembers}
             handleAddMember={handleAddMember}

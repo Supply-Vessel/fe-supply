@@ -1,10 +1,10 @@
-import type { PaymentStatus, PoStatus, RequestType, TSIConfirm } from "@/src/components/requests/types";
+import type { PaymentStatus, PoStatus, TSIConfirm, RequestTypeModel } from "@/src/components/requests/types";
 import type { ExperimentStatus, RequestStatus } from "../../account/types";
 
 export interface PageProps {
     params: {
         userId: string;
-       vesselId: string;
+        vesselId: string;
     }
 }
 
@@ -20,7 +20,8 @@ export interface Request {
     offerNumber?: string;
     companyOfOrder?: string;
     countryOfOrder?: string;
-    requestType: RequestType;
+    requestType?: RequestTypeModel;
+    requestTypeId: string;
     vesselId: string;
     createdAt: string;
     updatedAt: string;

@@ -8,7 +8,6 @@ export async function GET() {
             requestStatus: Object.values(RequestStatus),
             paymentStatus: Object.values(PaymentStatus),
             wayBillType: Object.values(WayBillType),
-            requestType: Object.values(RequestType),
             tsiConfirm: Object.values(TSIConfirm),
             poStatus: Object.values(PoStatus),
             role: Object.values(Role),

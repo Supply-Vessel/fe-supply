@@ -28,6 +28,7 @@ interface TeamViewProps {
     requestEnums: RequestEnums;
     confirmDelete: () => void;
     newMember: NewMemberTypes;
+    canInviteMembers: boolean;
     isAddDialogOpen: boolean;
     searchQuery: string;
     roleFilter: string;
@@ -40,6 +41,7 @@ export default function TeamView (props: TeamViewProps) {
         setIsAddDialogOpen,
         handleDeleteMember,
         isDeleteDialogOpen,
+        canInviteMembers,
         isAddDialogOpen,
         filteredMembers,
         handleAddMember,
@@ -66,13 +68,13 @@ export default function TeamView (props: TeamViewProps) {
                 Manage your vessel team and personnel
                 </p>
             </div>
-            <Button
+            {canInviteMembers &&<Button
                 className="bg-blue-600 hover:bg-blue-700"
                 onClick={() => setIsAddDialogOpen(true)}
             >
                 <Plus className="mr-2 h-4 w-4" />
                 Add Member
-            </Button>
+            </Button>}
             </div>
     
             <div className="flex flex-col sm:flex-row gap-4">

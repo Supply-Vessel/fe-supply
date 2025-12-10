@@ -1,4 +1,4 @@
-import { RequestStatus, AccessStatus, RequestType, PoStatus, PaymentStatus, TSIConfirm, WayBillType } from '@prisma/client';
+import { RequestStatus, AccessStatus, PoStatus, PaymentStatus, TSIConfirm, WayBillType } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { prismaClient } from '@/src/lib/server/prisma';
 
@@ -19,20 +19,20 @@ export async function POST(req: NextRequest) {
             offerNumber,
             companyOfOrder,
             countryOfOrder,
-            requestType,
+            requestTypeId,
             vesselId,
             userId,
         } = await req.json();
 
         // Check required fields
-        if (!identifier || !vesselId || !requestType) {
+        if (!identifier || !vesselId || !requestTypeId) {
             return NextResponse.json({
                 success: false,
-                message: 'Required fields: identifier, vesselId, requestType'
+                message: 'Required fields: identifier, vesselId, requestTypeId'
             }, { status: 400 });
         }
 
-        // Check if laboratory exists
+        // Check if vessel exists
         const vessel = await prismaClient.vessel.findFirst({
             where: {
                 name: vesselId,
@@ -52,18 +52,19 @@ export async function POST(req: NextRequest) {
             }, { status: 404 });
         }
 
-        // Check if request with this identifier already exists in this vessel
+        // Check if request with this identifier already exists in this vessel AND request type
         const existingRequest = await prismaClient.request.findFirst({
             where: {
                 identifier: identifier,
-                vesselId: vessel.id
+                vesselId: vessel.id,
+                requestTypeId: requestTypeId
             }
         });
 
         if (existingRequest) {
             return NextResponse.json({
                 success: false,
-                message: 'Request with this identifier already exists in this vessel'
+                message: 'Request with this identifier already exists in this request type'
             }, { status: 409 });
         }
 
@@ -83,7 +84,7 @@ export async function POST(req: NextRequest) {
                 offerNumber,
                 companyOfOrder,
                 countryOfOrder,
-                requestType: requestType as RequestType,
+                requestTypeId,
                 vesselId: vessel.id,
             },
             include: {
@@ -92,7 +93,8 @@ export async function POST(req: NextRequest) {
                         name: true,
                         id: true,
                     }
-                }
+                },
+                requestType: true
             }
         });
 
@@ -128,7 +130,7 @@ export async function PUT(req: NextRequest) {
             offerNumber,
             companyOfOrder,
             countryOfOrder,
-            requestType,
+            requestTypeId,
             vesselId,
             userId,
             id,
@@ -162,7 +164,7 @@ export async function PUT(req: NextRequest) {
             }, { status: 404 });
         }
 
-        // Check if request with this identifier already exists in this vessel
+        // Check if request exists
         const existingRequest = await prismaClient.request.findFirst({
             where: {
                 id: id,
@@ -184,7 +186,6 @@ export async function PUT(req: NextRequest) {
                 vesselId: vessel.id
             },
             data: {
-                id: id,
                 tsiConfirm: (tsiConfirm as TSIConfirm) || TSIConfirm.NOT_CONFIRMED,
                 identifier,
                 poStatus: (poStatus as PoStatus) || PoStatus.WITHOUT_PO,
@@ -198,8 +199,7 @@ export async function PUT(req: NextRequest) {
                 offerNumber,
                 companyOfOrder,
                 countryOfOrder,
-                requestType: (requestType as RequestType) || RequestType.ENGINE,
-                vesselId: vessel.id,
+                requestTypeId,
                 updatedAt: new Date(),
             },
             include: {
@@ -208,7 +208,8 @@ export async function PUT(req: NextRequest) {
                         name: true,
                         id: true,
                     }
-                }
+                },
+                requestType: true
             }
         });
 
@@ -216,7 +217,7 @@ export async function PUT(req: NextRequest) {
             success: true,
             data: request,
             message: 'Request updated successfully'
-        }, { status: 201 });
+        }, { status: 200 });
     } catch (error) {
         console.error('Error updating request:', error);
         return NextResponse.json({

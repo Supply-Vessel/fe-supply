@@ -1,5 +1,5 @@
+import type { AccessStatus, Role, UserType } from "../../account/types";
 import type { ActivityLevel, RecordType } from "../requests/types";
-import type { AccessStatus, Role } from "../../account/types";
 
 export interface VesselMembersTypes {
     id: string;
@@ -18,6 +18,7 @@ export interface VesselMembersTypes {
         email: string;
         address: string | null;
         contactPhone: string | null;
+        userType: UserType;
         institution: string | null;
         confirmedEmail: boolean;
         firstName: string | null;

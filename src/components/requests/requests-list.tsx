@@ -1,7 +1,7 @@
 "use client"
 
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/src/components/ui/pagination"
-import { Request, RequestStatus, RequestType, PoStatus, TSIConfirm, PaymentStatus, type RequestEnums, type RequestPagination, WayBillType } from "./types"
+import { Request, RequestStatus, PoStatus, TSIConfirm, PaymentStatus, type RequestEnums, type RequestPagination, WayBillType, type RequestTypeModel } from "./types"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
 import { LayoutGrid, LayoutList, Check, X, Plus, Link2, Plane, Package } from "lucide-react"
@@ -17,7 +17,7 @@ import { Card } from "@/src/components/ui/card"
 import { toast } from "sonner"
 
 interface RequestsListProps {
-  handleUpdateDataPagination: (data: {page?: number, pageSize?: number, defaultType: RequestType}) => void;
+  handleUpdateDataPagination: (data: {page?: number, pageSize?: number}) => void;
   setPagination: (pagination: RequestPagination) => void;
   setOpenEditRequestDialog: (open: boolean) => void;
   setOpenAddRequestDialog: (open: boolean) => void;
@@ -25,8 +25,9 @@ interface RequestsListProps {
   onSave: (request: Partial<Request>) => void;
   onAdd: (request: Partial<Request>) => void;
   requestPagination: RequestPagination;
+  defaultType?: RequestTypeModel;
   requestEnums: RequestEnums;
-  defaultType?: RequestType;
+  defaultTypeId?: string;
   requests: Request[];
 }
 
@@ -54,7 +55,7 @@ interface ColumnVisibility {
   storeLocation: boolean;
 }
 
-export function RequestsList({requests, requestPagination, setPagination, handleUpdateDataPagination, onSave, onAdd, defaultType, requestEnums, setSelectedRequest, setOpenEditRequestDialog, setOpenAddRequestDialog}: RequestsListProps) {
+export function RequestsList({requests, requestPagination, setPagination, handleUpdateDataPagination, onSave, onAdd, defaultType, defaultTypeId, requestEnums, setSelectedRequest, setOpenEditRequestDialog, setOpenAddRequestDialog}: RequestsListProps) {
   const [selectedRequests, setSelectedRequests] = useState<string[]>([])
   const [view, setView] = useState<"table" | "grid">("table")
   const [editingRows, setEditingRows] = useState<EditState>({})
@@ -125,7 +126,7 @@ export function RequestsList({requests, requestPagination, setPagination, handle
       ...requestPagination,
       currentPage: page
     })
-    handleUpdateDataPagination({page: Number(page), defaultType: defaultType as RequestType});
+    handleUpdateDataPagination({page: Number(page)});
     setSelectedRequests([])
   }
 
@@ -134,7 +135,7 @@ export function RequestsList({requests, requestPagination, setPagination, handle
       ...requestPagination,
       pageSize: Number(value),
     })
-    handleUpdateDataPagination({page: 1, pageSize: Number(value), defaultType: defaultType as RequestType});
+    handleUpdateDataPagination({page: 1, pageSize: Number(value)});
     setSelectedRequests([])
   }
 
@@ -159,7 +160,7 @@ export function RequestsList({requests, requestPagination, setPagination, handle
       return
     }
     if (dataToSave) {
-      onSave({ ...dataToSave, id: requestId, requestType: defaultType as RequestType })
+      onSave({ ...dataToSave, id: requestId, requestTypeId: defaultTypeId })
     }
     setEditingRows(prev => ({ ...prev, [requestId]: false }))
     setEditData(prev => {
@@ -186,8 +187,8 @@ export function RequestsList({requests, requestPagination, setPagination, handle
       description: "",
       status: RequestStatus.ON_HOLD,
       poStatus: PoStatus.WITHOUT_PO,
-      vesselId: Array.isArray(vesselId) ?vesselId[0] :vesselId || "",
-      requestType: defaultType as RequestType,
+      vesselId: Array.isArray(vesselId) ? vesselId[0] : vesselId || "",
+      requestTypeId: defaultTypeId,
     })
   }
 
@@ -249,7 +250,7 @@ export function RequestsList({requests, requestPagination, setPagination, handle
       case RequestStatus.RECEIVED:
         return "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
       case RequestStatus.ON_HOLD:
-        return "bg-orange-100 text-orange-800 hover:bg-orange-100"
+        return "bg-gray-100 text-gray-800 hover:bg-gray-100"
       case RequestStatus.CANCELLED:
         return "bg-red-100 text-red-800 hover:bg-red-100" // red-500
       default:
@@ -266,24 +267,11 @@ export function RequestsList({requests, requestPagination, setPagination, handle
       case RequestStatus.RECEIVED:
         return "bg-yellow-100/40 text-yellow-800 hover:bg-yellow-100"
       case RequestStatus.ON_HOLD:
-        return "bg-orange-100/40 text-orange-800 hover:bg-orange-100"
+        return "bg-gray-100/40 text-gray-800 hover:bg-gray-100"
       case RequestStatus.CANCELLED:
         return "bg-red-100/40 text-red-800 hover:bg-red-100"
       default:
         return "bg-gray-100/40 text-gray-800 hover:bg-gray-100"
-    }
-  }
-
-  const getRequestTypeColor = (type?: RequestType) => {
-    switch (type) {
-      case RequestType.ENGINE:
-        return "bg-orange-100 text-orange-800 hover:bg-orange-100"
-      case RequestType.ELECTRICAL:
-        return "bg-cyan-100 text-cyan-800 hover:bg-cyan-100"
-      case RequestType.DECK:
-        return "bg-slate-100 text-slate-800 hover:bg-slate-100"
-      default:
-        return "bg-gray-100 text-gray-800 hover:bg-gray-100"
     }
   }
 
@@ -613,8 +601,14 @@ export function RequestsList({requests, requestPagination, setPagination, handle
         <div className="flex items-center gap-2">
           {/* <Checkbox checked={selectedRequests.length === filteredRequests.length && filteredRequests.length > 0} onCheckedChange={toggleAllRequests} />
           <span className="text-sm text-gray-500">{selectedRequests.length} selected</span> */}
-          <Badge variant="outline" className={getRequestTypeColor(defaultType)}>
-            {defaultType || "N/A"}
+          <Badge 
+            variant="outline"
+            className={`${defaultType?.color ? "text-white" : "text-black"}`}
+            style={{ 
+              backgroundColor: `${defaultType?.color}60`,
+            }}
+          >
+            {defaultType?.name || "N/A"}
           </Badge>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -1006,8 +1000,14 @@ export function RequestsList({requests, requestPagination, setPagination, handle
             {filteredRequests.map((request) => (
               <div key={request.id} className="relative flex flex-col rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
                 <div className="flex items-start justify-between border-b border-gray-100 p-4 pb-3">
-                  <Badge variant="outline" className={getRequestTypeColor(defaultType)}>
-                    {defaultType || "N/A"}
+                  <Badge 
+                    variant="outline"
+                    className={`${defaultType?.color ? "text-white" : "text-black"}`}
+                    style={{ 
+                      backgroundColor: `${defaultType?.color}60`,
+                    }}
+                  >
+                    {defaultType?.name || "N/A"}
                   </Badge>
                   {/* <Checkbox
                     checked={selectedRequests.includes(request.id || "")}

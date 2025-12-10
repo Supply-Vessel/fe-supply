@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prismaClient } from '@/src/lib/server/prisma';
-import { AccessStatus } from '@prisma/client';
+import { AccessStatus, MemberStatus } from '@prisma/client';
 
 type RouteParams = {
     params: {
@@ -12,7 +12,7 @@ type RouteParams = {
 // GET /api/vessel/:userId/:vesselId - получить всех пользователей vessel
 export async function GET(req: NextRequest, { params }: RouteParams) {
     try {
-        const { userId,vesselId } = await params;
+        const { userId, vesselId } = await params;
 
         // Проверяем, что пользователь имеет доступ к лаборатории
         const userVessel = await prismaClient.userVessel.findFirst({
@@ -45,6 +45,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
                     select: {
                         id: true,
                         email: true,
+                        userType: true,
                         firstName: true,
                         lastName: true,
                         address: true,

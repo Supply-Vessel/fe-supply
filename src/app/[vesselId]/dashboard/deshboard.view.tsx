@@ -1,11 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
-import { RequestPopulationChart } from "@/src/components/dashboard/request-population-chart"
 import { StatusStatisticsChart } from "@/src/components/dashboard/status-statistics-chart"
-import { SubscriptionStatus } from "@/src/components/dashboard/subscription-status"
-import { NotificationPanel } from "@/src/components/dashboard/notification-panel"
 import { DashboardStatus } from "@/src/components/dashboard/dashboard-status"
-import { UpcomingEvents } from "@/src/components/dashboard/upcoming-events"
-import type { Experiment, Request, Task } from "./types"
+import { RequestChart } from "@/src/components/dashboard/request-chart"
+import type { Request } from "./types"
 
 export interface DashboardViewProps {
   requests: Request[];
@@ -31,7 +28,7 @@ export default function DashboardView({requests, previousMonthData}: DashboardVi
             <CardDescription>Request changes over the last 30 days</CardDescription>
           </CardHeader>
           <CardContent>
-            <RequestPopulationChart requests={requests} />
+            <RequestChart requests={requests} />
           </CardContent>
         </Card>
         <Card className="lg:col-span-3 w-[315px] md:w-full">

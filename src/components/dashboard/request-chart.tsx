@@ -3,15 +3,12 @@ import { ChartContainer, ChartTooltipContent } from "@/src/components/ui/chart"
 import type { Request } from "@/src/app/[vesselId]/dashboard/types"
 import { useMemo } from "react"
 
-const colors = [
-  { label: "Engine", color: "#FFA500" },
-  { label: "Electrical", color: "#808080" },
-  { label: "Deck", color: "#00FFFF" },
-] as const
+// Fallback colors if requestType doesn't have a color
+const fallbackColors = ["#FFA500", "#808080", "#00FFFF", "#10B981", "#F59E0B", "#EF4444"]
 
-function processRequestData(requests: Request[]): { chartData: any[], requestTypes: string[] } {
+function processRequestData(requests: Request[]): { chartData: any[], requestTypes: string[], typeColors: Record<string, string> } {
   if (!requests || requests.length === 0) {
-    return { chartData: [], requestTypes: [] }
+    return { chartData: [], requestTypes: [], typeColors: {} }
   }
 
   const thirtyDaysAgo = new Date()
@@ -23,9 +20,12 @@ function processRequestData(requests: Request[]): { chartData: any[], requestTyp
   })
 
   if (recentRequests.length === 0) {
-    return { chartData: [], requestTypes: [] }
+    return { chartData: [], requestTypes: [], typeColors: {} }
   }
 
+  // Collect colors from requestTypes
+  const typeColors: Record<string, string> = {}
+  
   const requestsByDate = recentRequests.reduce((acc, request) => {
     const date = new Date(request.createdAt)
     const dateKey = date.toISOString().split('T')[0] // YYYY-MM-DD format
@@ -34,16 +34,23 @@ function processRequestData(requests: Request[]): { chartData: any[], requestTyp
       acc[dateKey] = {}
     }
     
-    const requestType = request.requestType
-    if (!acc[dateKey][requestType]) {
-      acc[dateKey][requestType] = 0
+    // requestType is now an object with name, displayName, color properties
+    const requestTypeName = request.requestType?.name || request.requestType?.displayName || 'Unknown'
+    
+    // Store color from requestType if available
+    if (request.requestType?.color && !typeColors[requestTypeName]) {
+      typeColors[requestTypeName] = request.requestType.color
     }
     
-    acc[dateKey][requestType]++
+    if (!acc[dateKey][requestTypeName]) {
+      acc[dateKey][requestTypeName] = 0
+    }
+    
+    acc[dateKey][requestTypeName]++
     return acc
   }, {} as Record<string, Record<string, number>>)
 
-  const allRequestTypes = Array.from(new Set(recentRequests.map(r => r.requestType)))
+  const allRequestTypes = Array.from(new Set(recentRequests.map(r => r.requestType?.name || r.requestType?.displayName || 'Unknown')))
   
   const dateRange = []
   for (let i = 29; i >= 0; i--) {
@@ -67,11 +74,11 @@ function processRequestData(requests: Request[]): { chartData: any[], requestTyp
     return dataPoint
   })
 
-  return { chartData, requestTypes: allRequestTypes }
+  return { chartData, requestTypes: allRequestTypes, typeColors }
 }
 
-export function RequestPopulationChart({requests}: {requests: Request[]}) {
-  const { chartData, requestTypes } = useMemo(() => processRequestData(requests), [requests])
+export function RequestChart({requests}: {requests: Request[]}) {
+  const { chartData, requestTypes, typeColors } = useMemo(() => processRequestData(requests), [requests])
 
   if (!chartData || chartData.length === 0) {
     return (
@@ -84,10 +91,10 @@ export function RequestPopulationChart({requests}: {requests: Request[]}) {
   const config = useMemo(() => requestTypes.reduce((acc: Record<string, { label: string; color: string }>, type: string, index: number) => {
     acc[type] = {
       label: type,
-      color: colors[index % colors.length].color,
+      color: typeColors[type] || fallbackColors[index % fallbackColors.length],
     }
     return acc
-  }, {} as Record<string, { label: string; color: string }>), [requestTypes])
+  }, {} as Record<string, { label: string; color: string }>), [requestTypes, typeColors])
 
   return (
     <ChartContainer
@@ -112,7 +119,7 @@ export function RequestPopulationChart({requests}: {requests: Request[]}) {
               dataKey={type}
               strokeWidth={2}
               activeDot={{ r: 6 }}
-              stroke={colors[index % colors.length].color}
+              stroke={typeColors[type] || fallbackColors[index % fallbackColors.length]}
             />
           ))}
         </LineChart>

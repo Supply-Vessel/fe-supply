@@ -4,11 +4,11 @@ import { AccessStatus } from '@prisma/client';
 
 type RouteParams = {
     params: {
+        requestType: string;
+        vesselId: string;
         userId: string;
-       vesselId: string;
         rows: string;
         page: string;
-        requestType: string;
     };
 };
 
@@ -16,6 +16,7 @@ type RouteParams = {
 export async function GET(req: NextRequest, { params }: RouteParams) {
     try {
         const { userId,vesselId, rows, page, requestType } = await params;
+        console.log(userId, vesselId, rows, page, requestType);
         const rowsNumber = parseInt(rows);
         const pageNumber = parseInt(page);
         
@@ -40,9 +41,33 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
             }, { status: 403 });
         }
 
-        const whereCondition: any = {
+        // Find request type by name for this vessel
+        const requestTypeRecord = await prismaClient.requestTypeModel.findFirst({
+            where: {
+                name: requestType,
+                vesselId: userVessel.vessel.id
+            }
+        });
+
+        // If request type not found, return empty result
+        if (!requestTypeRecord) {
+            return NextResponse.json({ 
+                success: true, 
+                data: [],
+                pagination: {
+                    currentPage: pageNumber,
+                    pageSize: rowsNumber,
+                    totalCount: 0,
+                    totalPages: 0,
+                    hasNextPage: false,
+                    hasPreviousPage: false
+                }
+            }, { status: 200 });
+        }
+
+        const whereCondition = {
             vesselId: userVessel.vessel.id,
-            requestType: requestType
+            requestTypeId: requestTypeRecord.id
         };
         
         const requests = await prismaClient.request.findMany({
@@ -55,7 +80,8 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
                         id: true,
                         name: true
                     }
-                }
+                },
+                requestType: true
             },
             orderBy: {
                 createdAt: 'desc'
