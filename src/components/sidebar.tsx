@@ -4,6 +4,7 @@ import { useParams, usePathname, useRouter } from "next/navigation"
 import { useSidebar } from "@/src/components/sidebar-provider"
 import { ScrollArea } from "@/src/components/ui/scroll-area"
 import { Button } from "@/src/components/ui/button"
+import { AuthService } from "../lib/auth"
 import { cn } from "@/src/lib/utils"
 import type React from "react"
 import Link from "next/link"
@@ -20,12 +21,12 @@ import {
 export function Sidebar() {
   const { isOpen, toggle } = useSidebar();
   const params = useParams();
-  const { userId,vesselId } = params;
+  const { organizationName, vesselId } = params;
   const pathname = usePathname();
   const router = useRouter();
 
   const handleLogOut = () => {
-    router.replace('/');
+    AuthService.logout();
   }
 
   return (
@@ -54,24 +55,24 @@ export function Sidebar() {
         <div className="px-3 py-2">
           <nav className="flex flex-col gap-1">
             <NavItem
-              href={`/${vesselId}/dashboard`}
+              href={`/${organizationName}/${vesselId}/dashboard`}
               icon={LayoutDashboard}
               label="Dashboard"
-              isActive={pathname === `/${vesselId}/dashboard`}
+              isActive={pathname === `/${organizationName}/${vesselId}/dashboard`}
               isOpen={isOpen}
             />
             <NavItem
-              href={`/${vesselId}/requests`}
+              href={`/${organizationName}/${vesselId}/requests`}
               icon={PackageOpen}
               label="Requests Status"
-              isActive={pathname.startsWith(`/${vesselId}/requests`)}
+              isActive={pathname.startsWith(`/${organizationName}/${vesselId}/requests`)}
               isOpen={isOpen}
             />
             <NavItem
-              href={`/${vesselId}/team`}
+              href={`/${organizationName}/${vesselId}/team`}
               icon={BookUser}
               label="Team"
-              isActive={pathname.startsWith(`/${vesselId}/team`)}
+              isActive={pathname.startsWith(`/${organizationName}/${vesselId}/team`)}
               isOpen={isOpen}
             />
           </nav>

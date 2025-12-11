@@ -1,117 +1,148 @@
 "use client"
 
-import type { Request, RequestEnums, RequestPagination } from "@/src/components/requests/types"
+import { useEffect, useState } from "react"
+import type { Request, RequestEnums, RequestPagination, RequestTypeModel } from "@/src/components/requests/types"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { RequestsList } from "@/src/components/requests/requests-list"
-import { RequestType } from "@/src/components/requests/types"
 import { EditAnimalDialog } from "./edit-request-dialog"
 import { AddAnimalDialog } from "./add-request-dialog"
-import { useState } from "react"
 
 interface RequestsTabsProps {
-  handleUpdateDataPagination: (data: { page?: number; pageSize?: number; defaultType: RequestType }) => Promise<void>;
+  requestTypes: RequestTypeModel[];
+  requestsData: Record<string, Request[]>;
+  paginationData: Record<string, RequestPagination>;
+  handleUpdateDataPagination: (data: { page?: number; pageSize?: number; requestTypeId: string }) => Promise<void>;
+  handleFetchRequests: (typeId: string, page?: number, pageSize?: number) => Promise<void>;
   handleSaveRequest: (request: Partial<Request>) => Promise<void>;
   handleAddRequest: (request: Partial<Request>) => Promise<void>;
-  setElectricPagination: (pagination: RequestPagination) => void;
-  setEnginePagination: (pagination: RequestPagination) => void;
-  setDeckPagination: (pagination: RequestPagination) => void;
-  electricPagination: RequestPagination
-  enginePagination: RequestPagination
-  deckPagination: RequestPagination
-  requestEnums: RequestEnums
-  electricData: Request[]
-  engineData: Request[]
-  deckData: Request[]
-  vesselId: string
-  userId: string
+  requestEnums: RequestEnums;
+  vesselId: string;
+  userId: string;
 }
 
-export function RequestsTabs(props: RequestsTabsProps) {
-  const {handleUpdateDataPagination, handleSaveRequest, handleAddRequest, setElectricPagination, setEnginePagination, setDeckPagination} = props;
-  const {requestEnums, userId,vesselId, enginePagination, electricPagination, deckPagination, engineData, electricData, deckData} = props;
+const defaultPagination: RequestPagination = {
+  hasPreviousPage: false,
+  hasNextPage: false,
+  currentPage: 1,
+  totalCount: 0,
+  totalPages: 1,
+  pageSize: 10
+};
 
-  const [selectedRequest, setSelectedRequest] = useState<Request | null>(null)
-  const [openEditRequestDialog, setOpenEditRequestDialog] = useState(false)
-  const [openAddRequestDialog, setOpenAddRequestDialog] = useState(false)
+export function RequestsTabs(props: RequestsTabsProps) {
+  const {
+    handleUpdateDataPagination,
+    handleFetchRequests,
+    handleSaveRequest,
+    handleAddRequest,
+    paginationData,
+    requestTypes,
+    requestsData,
+    requestEnums,
+    vesselId,
+    userId,
+  } = props;
+
+  const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
+  const [openEditRequestDialog, setOpenEditRequestDialog] = useState(false);
+  const [openAddRequestDialog, setOpenAddRequestDialog] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("");
+  const [loadedTabs, setLoadedTabs] = useState<Set<string>>(new Set());
+
+  // Set initial active tab when request types are loaded
+  useEffect(() => {
+    if (requestTypes.length > 0 && !activeTab) {
+      setActiveTab(requestTypes[0].id);
+    }
+  }, [requestTypes, activeTab]);
+
+  // Fetch data when tab becomes active for the first time
+  useEffect(() => {
+    if (activeTab && !loadedTabs.has(activeTab)) {
+      handleFetchRequests(activeTab);
+      setLoadedTabs(prev => new Set([...prev, activeTab]));
+    }
+  }, [activeTab, loadedTabs, handleFetchRequests]);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+  };
+
+  if (requestTypes.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <p className="text-muted-foreground mb-4">No request types created yet.</p>
+        <p className="text-sm text-muted-foreground">
+          Click &quot;Add Request Type&quot; button above to create your first request type.
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <Tabs defaultValue="engine" className="w-full">
-      <TabsList className="grid w-full grid-cols-3">
-        <TabsTrigger value="engine">Engine</TabsTrigger>
-        <TabsTrigger value="electric">Electrical</TabsTrigger>
-        <TabsTrigger value="deck">Deck</TabsTrigger>
+    <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+      <TabsList className="flex flex-wrap h-auto gap-1 justify-between">
+        {requestTypes.map((type) => (
+          <TabsTrigger
+            key={type.id}
+            value={type.id}
+            className="flex items-center gap-2 flex-1 justify-center"
+          >
+            {type.color && (
+              <span
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: type.color }}
+              />
+            )}
+            {type.displayName}
+          </TabsTrigger>
+        ))}
       </TabsList>
 
-      <TabsContent value="engine" className="mt-6">
-        <RequestsList
-          handleUpdateDataPagination={handleUpdateDataPagination}
-          setOpenEditRequestDialog={setOpenEditRequestDialog}
-          setOpenAddRequestDialog={setOpenAddRequestDialog}
-          setSelectedRequest={setSelectedRequest}
-          setPagination={setEnginePagination}
-          requestPagination={enginePagination}
-          defaultType={RequestType.ENGINE}
-          requestEnums={requestEnums}
-          onSave={handleSaveRequest}
-          onAdd={handleAddRequest}
-          requests={engineData}
-        />
-      </TabsContent>
-
-      <TabsContent value="electric" className="mt-6">
-        <RequestsList
-          handleUpdateDataPagination={handleUpdateDataPagination}
-          setOpenEditRequestDialog={setOpenEditRequestDialog}
-          setOpenAddRequestDialog={setOpenAddRequestDialog}
-          setSelectedRequest={setSelectedRequest}
-          setPagination={setElectricPagination}
-          requestPagination={electricPagination}
-          defaultType={RequestType.ELECTRICAL}
-          requestEnums={requestEnums}
-          onSave={handleSaveRequest}
-          onAdd={handleAddRequest}
-          requests={electricData}
-        />
-      </TabsContent>
-
-      <TabsContent value="deck" className="mt-6">
-        <RequestsList
-          handleUpdateDataPagination={handleUpdateDataPagination}
-          setOpenEditRequestDialog={setOpenEditRequestDialog}
-          setOpenAddRequestDialog={setOpenAddRequestDialog}
-          setSelectedRequest={setSelectedRequest}
-          setPagination={setDeckPagination}
-          requestPagination={deckPagination}
-          defaultType={RequestType.DECK}
-          requestEnums={requestEnums}
-          onSave={handleSaveRequest}
-          onAdd={handleAddRequest}
-          requests={deckData}
-        />
-      </TabsContent>
+      {requestTypes.map((type) => (
+        <TabsContent key={type.id} value={type.id} className="mt-6">
+          <RequestsList
+            handleUpdateDataPagination={(data) => 
+              handleUpdateDataPagination({ ...data, requestTypeId: type.id })
+            }
+            requestPagination={paginationData[type.id] || defaultPagination}
+            setOpenEditRequestDialog={setOpenEditRequestDialog}
+            setOpenAddRequestDialog={setOpenAddRequestDialog}
+            setSelectedRequest={setSelectedRequest}
+            requests={requestsData[type.id] || []}
+            setPagination={() => {}}
+            requestEnums={requestEnums}
+            onSave={handleSaveRequest}
+            onAdd={handleAddRequest}
+            defaultTypeId={type.id}
+            defaultType={type}
+          />
+        </TabsContent>
+      ))}
 
       <AddAnimalDialog
-          loadingButtonText={"Adding Request"}
-          setOpen={setOpenAddRequestDialog}
-          submitButtonText={"Add Request"}
-          onSubmit={handleAddRequest}
-          requestEnums={requestEnums}
-          open={openAddRequestDialog}
-          userId={userId}
+        loadingButtonText={"Adding Request"}
+        setOpen={setOpenAddRequestDialog}
+        submitButtonText={"Add Request"}
+        onSubmit={handleAddRequest}
+        requestEnums={requestEnums}
+        open={openAddRequestDialog}
+        requestTypes={requestTypes}
+        userId={userId}
       />
 
       <EditAnimalDialog
-          loadingButtonText={"Editing Request"}
-          setOpen={setOpenEditRequestDialog}
-          selectedRequest={selectedRequest}
-          submitButtonText={"Edit Request"}
-          onSubmit={handleSaveRequest}
-          open={openEditRequestDialog}
-          requestEnums={requestEnums}
-          vesselId={vesselId}
-          userId={userId}
+        loadingButtonText={"Editing Request"}
+        setOpen={setOpenEditRequestDialog}
+        selectedRequest={selectedRequest}
+        submitButtonText={"Edit Request"}
+        onSubmit={handleSaveRequest}
+        open={openEditRequestDialog}
+        requestEnums={requestEnums}
+        requestTypes={requestTypes}
+        vesselId={vesselId}
+        userId={userId}
       />
     </Tabs>
-  )
+  );
 }
-

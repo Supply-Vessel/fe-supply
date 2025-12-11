@@ -1,8 +1,8 @@
 "use client"
 
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts"
+import type { Request } from "@/src/app/[organizationName]/[vesselId]/dashboard/types"
 import { ChartContainer, ChartTooltipContent } from "@/src/components/ui/chart"
-import type { Request } from "@/src/app/[vesselId]/dashboard/types"
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts"
 import { useMemo } from "react"
 
 const statusMapping = {

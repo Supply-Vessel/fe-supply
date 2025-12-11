@@ -1,6 +1,6 @@
 "use client"
 
-import { RequestStatus, PaymentStatus, RequestType, TSIConfirm, PoStatus, type RequestEnums, type Request, WayBillType } from "./types"
+import { RequestStatus, PaymentStatus, TSIConfirm, PoStatus, type RequestEnums, type Request, WayBillType, type RequestTypeModel } from "./types"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/src/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -32,12 +32,12 @@ function getWayBillNumberPlaceholder(wayBillType?: WayBillType) {
 }
 
 const formSchema = z.object({
-    identifier: z.string().min(1, "Identifier is required").max(50, "Identifier must be less than 5 characters"),
+    identifier: z.string().min(1, "Identifier is required").max(50, "Identifier must be less than 50 characters"),
     description: z.string().optional(),
     wayBillNumber: z.string().optional(),
     storeLocation: z.string().optional(),
     wayBillType: z.nativeEnum(WayBillType).default(WayBillType.NO_WAYBILL),
-    requestType: z.nativeEnum(RequestType),
+    requestTypeId: z.string().min(1, "Request type is required"),
     poStatus: z.nativeEnum(PoStatus).optional(),
     tsiConfirm: z.nativeEnum(TSIConfirm).optional(),
     paymentStatus: z.nativeEnum(PaymentStatus).optional(),
@@ -51,6 +51,7 @@ interface AddAnimalDialogProps {
     onSubmit: (request: Partial<Request>) => Promise<void>
     setOpen: (open: boolean) => void
     requestEnums: RequestEnums
+    requestTypes?: RequestTypeModel[]
     loadingButtonText: string
     trigger?: React.ReactNode
     submitButtonText: string
@@ -62,6 +63,7 @@ export function AddAnimalDialog({
     loadingButtonText,
     submitButtonText,
     requestEnums,
+    requestTypes = [],
     onSubmit, 
     setOpen,
     open,
@@ -76,7 +78,7 @@ export function AddAnimalDialog({
         wayBillType: WayBillType.NO_WAYBILL,
         wayBillNumber: "",
         storeLocation: "",
-        requestType: undefined,
+        requestTypeId: "",
         poStatus: undefined,
         tsiConfirm: undefined,
         paymentStatus: undefined,
@@ -110,7 +112,6 @@ export function AddAnimalDialog({
         className="max-w-2xl max-h-[90vh] overflow-y-auto" 
         id="add-request-dialog"
         onInteractOutside={(e) => {
-          // Предотвращаем закрытие диалога при клике на Select dropdown
           const target = e.target as Element
           if (target && target.closest('[data-radix-select-content]')) {
             e.preventDefault()
@@ -146,7 +147,7 @@ export function AddAnimalDialog({
               {/* Request Type */}
               <FormField
                 control={form.control}
-                name="requestType"
+                name="requestTypeId"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Request Type *</FormLabel>
@@ -157,14 +158,22 @@ export function AddAnimalDialog({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {requestEnums.requestType.length === 0 ? (
+                        {requestTypes.length === 0 ? (
                           <div className="p-2 text-center text-sm text-gray-500">
-                            No request types found
+                            No request types found. Create one first.
                           </div>
                         ) : (
-                          requestEnums.requestType.map((type: RequestType) => (
-                            <SelectItem key={type} value={type}>
-                              {type}
+                          requestTypes.map((type) => (
+                            <SelectItem key={type.id} value={type.id}>
+                              <div className="flex items-center gap-2">
+                                {type.color && (
+                                  <span
+                                    className="w-2 h-2 rounded-full"
+                                    style={{ backgroundColor: type.color }}
+                                  />
+                                )}
+                                {type.displayName}
+                              </div>
                             </SelectItem>
                           ))
                         )}

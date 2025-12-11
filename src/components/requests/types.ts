@@ -1,11 +1,5 @@
 // ==================== ENUMS ====================
 
-export enum RequestType {
-  ENGINE = "ENGINE",
-  ELECTRICAL = "ELECTRICAL",
-  DECK = "DECK",
-}
-
 export enum RequestStatus {
   WAITING = "WAITING",
   ORDERED = "ORDERED",
@@ -99,7 +93,10 @@ export interface Vessel {
 export interface RequestTypeModel {
   id: string;
   name: string;
+  displayName: string;
   description?: string;
+  color?: string;
+  isDefault?: boolean;
   vesselId: string;
   createdAt?: string;
   updatedAt?: string;
@@ -147,7 +144,7 @@ export interface Request {
   createdAt?: string;
   updatedAt?: string;
   // Relations
-  requestType?: RequestType;
+  requestType?: string;
   vessel?: Vessel;
   records?: RequestRecord[];
   customFields?: CustomFieldValue[];
@@ -185,7 +182,7 @@ export interface RequestRecord {
 export interface CreateRequestData {
   identifier: string;
   description?: string;
-  requestType?: RequestType;
+  requestType?: string;
   requestTypeId?: string;
   poStatus?: PoStatus;
   poNumber?: string;
@@ -244,7 +241,7 @@ export interface RequestPagination {
 
 export interface RequestFilters {
   statuses?: RequestStatus[];
-  requestTypes?: RequestType[];
+  requestTypes?: string[];
   poStatus?: PoStatus[];
   paymentStatus?: PaymentStatus[];
   tsiConfirm?: TSIConfirm[];
@@ -260,14 +257,14 @@ export interface RequestsListProps {
   handleUpdateDataPagination: (data: { page?: number; pageSize?: number }) => void;
   onSave: (request: Partial<Request>) => void;
   onAdd: (request: Partial<Request>) => void;
-  defaultType?: RequestType;
+  defaultType?: string;
 }
 
 export interface RequestEnums {
   requestStatus: RequestStatus[];
   paymentStatus: PaymentStatus[];
   wayBillType: WayBillType[];
-  requestType: RequestType[];
+  requestType: string[];
   tsiConfirm: TSIConfirm[];
   poStatus: PoStatus[];
   role: Role[];
