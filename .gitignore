@@ -26,3 +26,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .cursor
+
+# prisma
+prisma/migration-guideDev.ts
+prisma/schema.currentProdDev.prisma
