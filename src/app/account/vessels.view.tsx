@@ -280,7 +280,7 @@ export default function VesselsView(
                     <Card
                         key={vessel.id}
                         className="hover:shadow-md transition-shadow duration-200 cursor-pointer group"
-                        onClick={() => handleVesselClick(vessel.name)}
+                        onClick={() => handleVesselClick(vessel.organizationName, vessel.name)}
                     >
                         <CardHeader className="pb-3">
                             <div className="flex items-start justify-between">

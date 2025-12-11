@@ -2,12 +2,64 @@
 
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/src/components/ui/input-otp"
 import { EyeIcon, EyeOffIcon, CheckCircle, AlertCircle } from "lucide-react"
-import { UserType, RegularFormData, RegularSubmitData } from "./types"
-import React, { useCallback, useMemo, useState } from "react"
+import { UserType, RegularSubmitData } from "./types"
+import { useForm, Controller } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import React, { useCallback, useState } from "react"
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
 import Link from "next/link"
+import { z } from "zod"
+
+// Функция проверки силы пароля
+const calculatePasswordStrength = (password: string): number => {
+  let strength = 0
+  if (password.length >= 8) strength++
+  if (/[A-Z]/.test(password)) strength++
+  if (/[a-z]/.test(password)) strength++
+  if (/[0-9]/.test(password)) strength++
+  if (/[^A-Za-z0-9]/.test(password)) strength++
+  return strength
+}
+
+// Zod схема валидации
+const regularFormSchema = z.object({
+  firstName: z
+    .string()
+    .min(1, "First name is required")
+    .min(2, "First name must be at least 2 characters"),
+  lastName: z
+    .string()
+    .min(1, "Last name is required")
+    .min(2, "Last name must be at least 2 characters"),
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .email("Please enter a valid email address"),
+  password: z
+    .string()
+    .min(1, "Password is required")
+    .min(8, "Password must be at least 8 characters")
+    .refine(
+      (password) => calculatePasswordStrength(password) >= 3,
+      "Password is too weak. Include uppercase, lowercase, numbers, and special characters"
+    ),
+  confirmPassword: z
+    .string()
+    .min(1, "Please confirm your password"),
+  invitationCode: z
+    .string()
+    .length(6, "Invitation code must be exactly 6 characters"),
+  agreeToTerms: z
+    .boolean()
+    .refine((val) => val === true, "You must agree to the terms and conditions"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+})
+
+type RegularFormSchema = z.infer<typeof regularFormSchema>
 
 interface RegularRegistrationFormProps {
   onSubmit: (data: RegularSubmitData) => Promise<void>
@@ -24,45 +76,32 @@ export default function RegularRegistrationForm({
   error, 
   success 
 }: RegularRegistrationFormProps) {
-  const [formData, setFormData] = useState<RegularFormData>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    invitationCode: "",
-    agreeToTerms: false,
-  })
-
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [passwordStrength, setPasswordStrength] = useState(0)
 
-  const calculatePasswordStrength = useCallback((password: string) => {
-    let strength = 0
-    if (password.length >= 8) strength++
-    if (/[A-Z]/.test(password)) strength++
-    if (/[a-z]/.test(password)) strength++
-    if (/[0-9]/.test(password)) strength++
-    if (/[^A-Za-z0-9]/.test(password)) strength++
-    return strength
-  }, [])
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    formState: { errors, isValid },
+  } = useForm<RegularFormSchema>({
+    resolver: zodResolver(regularFormSchema),
+    mode: "onChange",
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      invitationCode: "",
+      agreeToTerms: false,
+    },
+  })
 
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }))
-
-    if (name === "password") {
-      setPasswordStrength(calculatePasswordStrength(value))
-    }
-  }, [calculatePasswordStrength])
-
-  const handleInvitationCodeChange = useCallback((value: string) => {
-    setFormData(prev => ({ ...prev, invitationCode: value }))
-  }, [])
+  const password = watch("password")
+  const confirmPassword = watch("confirmPassword")
+  const passwordStrength = calculatePasswordStrength(password || "")
 
   const getPasswordStrengthColor = useCallback((strength: number) => {
     if (strength <= 2) return "bg-red-500"
@@ -76,53 +115,48 @@ export default function RegularRegistrationForm({
     return "Strong"
   }, [])
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-    const { agreeToTerms, confirmPassword, ...submitData } = formData
+  const onFormSubmit = async (data: RegularFormSchema) => {
+    const { agreeToTerms, confirmPassword, ...submitData } = data
     await onSubmit({
       ...submitData,
       userType: UserType.REGULAR,
     })
-  }, [formData, onSubmit])
-
-  const isFormValid = useMemo(() => {
-    return (
-      formData.firstName &&
-      formData.lastName &&
-      formData.email &&
-      formData.password &&
-      formData.confirmPassword &&
-      formData.password === formData.confirmPassword &&
-      formData.invitationCode.length === 6 &&
-      formData.agreeToTerms &&
-      passwordStrength >= 3
-    )
-  }, [formData, passwordStrength])
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
       {/* Invitation Code */}
       <div className="space-y-2">
         <Label htmlFor="invitation-code">Invitation Code *</Label>
         <div className="flex justify-center py-2">
-          <InputOTP 
-            maxLength={6} 
-            value={formData.invitationCode} 
-            onChange={handleInvitationCodeChange}
-          >
-            <InputOTPGroup>
-              <InputOTPSlot index={0} />
-              <InputOTPSlot index={1} />
-              <InputOTPSlot index={2} />
-              <InputOTPSlot index={3} />
-              <InputOTPSlot index={4} />
-              <InputOTPSlot index={5} />
-            </InputOTPGroup>
-          </InputOTP>
+          <Controller
+            name="invitationCode"
+            control={control}
+            render={({ field }) => (
+              <InputOTP 
+                maxLength={6} 
+                value={field.value} 
+                onChange={field.onChange}
+              >
+                <InputOTPGroup>
+                  <InputOTPSlot index={0} />
+                  <InputOTPSlot index={1} />
+                  <InputOTPSlot index={2} />
+                  <InputOTPSlot index={3} />
+                  <InputOTPSlot index={4} />
+                  <InputOTPSlot index={5} />
+                </InputOTPGroup>
+              </InputOTP>
+            )}
+          />
         </div>
-        <p className="text-xs text-gray-600 text-center">
-          Enter the 6-digit code provided by your organization administrator
-        </p>
+        {errors.invitationCode ? (
+          <p className="text-xs text-red-500 text-center">{errors.invitationCode.message}</p>
+        ) : (
+          <p className="text-xs text-gray-600 text-center">
+            Enter the 6-digit code provided by your organization administrator
+          </p>
+        )}
       </div>
 
       {/* Name Fields */}
@@ -131,25 +165,27 @@ export default function RegularRegistrationForm({
           <Label htmlFor="regular-firstName">First Name *</Label>
           <Input
             id="regular-firstName"
-            name="firstName"
             type="text"
-            required
             placeholder="John"
-            value={formData.firstName}
-            onChange={handleInputChange}
+            {...register("firstName")}
+            className={errors.firstName ? "border-red-500" : ""}
           />
+          {errors.firstName && (
+            <p className="text-xs text-red-500">{errors.firstName.message}</p>
+          )}
         </div>
         <div className="space-y-2">
           <Label htmlFor="regular-lastName">Last Name *</Label>
           <Input
             id="regular-lastName"
-            name="lastName"
             type="text"
-            required
             placeholder="Doe"
-            value={formData.lastName}
-            onChange={handleInputChange}
+            {...register("lastName")}
+            className={errors.lastName ? "border-red-500" : ""}
           />
+          {errors.lastName && (
+            <p className="text-xs text-red-500">{errors.lastName.message}</p>
+          )}
         </div>
       </div>
 
@@ -158,32 +194,31 @@ export default function RegularRegistrationForm({
         <Label htmlFor="regular-email">Email *</Label>
         <Input
           id="regular-email"
-          name="email"
           type="email"
-          required
           placeholder="your.email@company.com"
-          value={formData.email}
-          onChange={handleInputChange}
+          {...register("email")}
+          className={errors.email ? "border-red-500" : ""}
         />
-        <p className="text-xs text-gray-500">
-          Use the same email address that received the invitation
-        </p>
+        {errors.email ? (
+          <p className="text-xs text-red-500">{errors.email.message}</p>
+        ) : (
+          <p className="text-xs text-gray-500">
+            Use the same email address that received the invitation
+          </p>
+        )}
       </div>
 
       {/* Password */}
       <div className="space-y-2">
-        <Label htmlFor="regular-password">Password</Label>
+        <Label htmlFor="regular-password">Password *</Label>
         <div className="relative">
           <Input
             id="regular-password"
-            name="password"
             type={showPassword ? "text" : "password"}
             autoComplete="new-password"
-            required
             placeholder="••••••••"
-            value={formData.password}
-            onChange={handleInputChange}
-            className="pr-10"
+            {...register("password")}
+            className={`pr-10 ${errors.password ? "border-red-500" : ""}`}
           />
           <button
             type="button"
@@ -199,7 +234,7 @@ export default function RegularRegistrationForm({
         </div>
 
         {/* Password Strength Indicator */}
-        {formData.password && (
+        {password && (
           <div className="mt-2">
             <div className="flex items-center justify-between text-xs mb-1">
               <span className="text-gray-600">Password strength:</span>
@@ -223,22 +258,22 @@ export default function RegularRegistrationForm({
             </div>
           </div>
         )}
+        {errors.password && (
+          <p className="text-xs text-red-500">{errors.password.message}</p>
+        )}
       </div>
 
       {/* Confirm Password */}
       <div className="space-y-2">
-        <Label htmlFor="regular-confirmPassword">Confirm Password</Label>
+        <Label htmlFor="regular-confirmPassword">Confirm Password *</Label>
         <div className="relative">
           <Input
             id="regular-confirmPassword"
-            name="confirmPassword"
             type={showConfirmPassword ? "text" : "password"}
             autoComplete="new-password"
-            required
             placeholder="••••••••"
-            value={formData.confirmPassword}
-            onChange={handleInputChange}
-            className="pr-10"
+            {...register("confirmPassword")}
+            className={`pr-10 ${errors.confirmPassword ? "border-red-500" : ""}`}
           />
           <button
             type="button"
@@ -254,9 +289,9 @@ export default function RegularRegistrationForm({
         </div>
 
         {/* Password Match Indicator */}
-        {formData.confirmPassword && (
+        {confirmPassword && !errors.confirmPassword && (
           <div className="mt-1 flex items-center text-xs">
-            {formData.password === formData.confirmPassword ? (
+            {password === confirmPassword ? (
               <>
                 <CheckCircle className="h-3 w-3 text-green-500 mr-1" />
                 <span className="text-green-500">Passwords match</span>
@@ -269,18 +304,25 @@ export default function RegularRegistrationForm({
             )}
           </div>
         )}
+        {errors.confirmPassword && (
+          <p className="text-xs text-red-500">{errors.confirmPassword.message}</p>
+        )}
       </div>
       
       {/* Terms */}
       <div className="flex items-start">
-        <input
-          type="checkbox"
-          id="regular-agreeToTerms"
+        <Controller
           name="agreeToTerms"
-          checked={formData.agreeToTerms}
-          onChange={handleInputChange}
-          className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-          required
+          control={control}
+          render={({ field }) => (
+            <input
+              type="checkbox"
+              id="regular-agreeToTerms"
+              checked={field.value}
+              onChange={field.onChange}
+              className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+          )}
         />
         <label htmlFor="regular-agreeToTerms" className="ml-2 text-sm text-gray-700">
           I agree to the{" "}
@@ -293,6 +335,9 @@ export default function RegularRegistrationForm({
           </Link>
         </label>
       </div>
+      {errors.agreeToTerms && (
+        <p className="text-xs text-red-500">{errors.agreeToTerms.message}</p>
+      )}
 
       {/* Error/Success messages */}
       {error && (
@@ -315,7 +360,7 @@ export default function RegularRegistrationForm({
       <Button 
         type="submit" 
         className="w-full bg-green-600 hover:bg-green-700" 
-        disabled={!isFormValid || isLoading}
+        disabled={!isValid || isLoading}
       >
         {isLoading ? "Creating account..." : "Join Organization"}
       </Button>
@@ -335,4 +380,3 @@ export default function RegularRegistrationForm({
     </form>
   )
 }
-

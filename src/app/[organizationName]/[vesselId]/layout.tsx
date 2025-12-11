@@ -3,7 +3,7 @@
 import { DashboardHeader } from "@/src/components/dashboard/dashboard-header"
 import { SidebarProvider } from "@/src/components/sidebar-provider"
 import { Sidebar } from "@/src/components/sidebar"
-import type { Vessel } from "../account/types"
+import type { Vessel } from "../../account/types"
 import { apiClient } from "@/src/lib/apiClient"
 import { redirect } from 'next/navigation'
 import { cookies } from "next/headers"

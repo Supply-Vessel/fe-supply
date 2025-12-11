@@ -1,5 +1,5 @@
 import type { PaymentStatus, PoStatus, TSIConfirm, RequestTypeModel } from "@/src/components/requests/types";
-import type { ExperimentStatus, RequestStatus } from "../../account/types";
+import type { ExperimentStatus, RequestStatus } from "../../../account/types";
 
 export interface PageProps {
     params: {

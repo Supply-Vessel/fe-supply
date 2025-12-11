@@ -54,8 +54,8 @@ export interface Vessel {
     position: Role
     description: string | null
     userRole: Role
-    organizationId?: string
-    organizationName?: string
+    organizationId: string
+    organizationName: string
 }
 
 // User types
@@ -94,7 +94,7 @@ export interface InviteMemberForm {
 // View props
 export interface VesselsViewProps {
     setSearchTerm: React.Dispatch<SetStateAction<string>>;
-    handleVesselClick: (vesselId: string) => void;
+    handleVesselClick: (organizationName: string, vesselName: string) => void;
     handleInviteMember: (formData: InviteMemberForm) => Promise<void>;
     formatDate: (date: Date | string) => string;
     handleCreateVessel: VoidFunction;

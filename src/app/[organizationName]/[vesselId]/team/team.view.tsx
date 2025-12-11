@@ -6,7 +6,7 @@ import type { RequestEnums } from "@/src/components/requests/types";
 import { NewMemberTypes, VesselMembersTypes } from "./types";
 import { Card, CardContent } from "@/src/components/ui/card";
 import { getUserInitials } from "@/src/lib/getUserInitials";
-import { AccessStatus, Role } from "../../account/types";
+import { AccessStatus, Role } from "../../../account/types";
 import type { Dispatch, SetStateAction } from "react";
 import { Button } from "@/src/components/ui/button";
 import { Avatar } from "@/src/components/ui/avatar";

@@ -122,7 +122,8 @@ export default function SignUpPage() {
                 <div className="flex items-center justify-between">
                   <CardTitle>Create Organization</CardTitle>
                   <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-                    From $49/month
+                    {/* From $49/month */}
+                    Free
                   </Badge>
                 </div>
                 <CardDescription>

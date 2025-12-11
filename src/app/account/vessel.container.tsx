@@ -90,7 +90,7 @@ export default function VesselsContainer({ accountData }: VesselsContainerProps)
         ),
         [vessels, searchTerm]
     );
-
+console.log(filteredVessels)
     const formatDate = useCallback((date: Date | string) => {
         const dateObj = typeof date === 'string' ? new Date(date) : date;
         
@@ -105,8 +105,8 @@ export default function VesselsContainer({ accountData }: VesselsContainerProps)
         }).format(dateObj);
     }, []);
 
-    const handleVesselClick = useCallback((vesselId: string) => {
-        router.push(`/${vesselId}/dashboard`)
+    const handleVesselClick = useCallback((organizationName: string, vesselName: string) => {
+        router.push(`/${organizationName}/${vesselName}/dashboard`)
     }, [router]);
 
     const handleCreateVessel = useCallback(() => {

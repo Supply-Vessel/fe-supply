@@ -1,4 +1,4 @@
-import type { AccessStatus, Role, UserType } from "../../account/types";
+import type { AccessStatus, Role, UserType } from "../../../account/types";
 import type { ActivityLevel, RecordType } from "../requests/types";
 
 export interface VesselMembersTypes {

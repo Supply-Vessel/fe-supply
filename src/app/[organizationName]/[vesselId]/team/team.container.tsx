@@ -1,8 +1,8 @@
 "use client";
 
 import type { RequestEnums } from "@/src/components/requests/types";
+import type { Organization } from "../../../account/types";
 import { OrgRole, type UserType } from "@prisma/client";
-import type { Organization } from "../../account/types";
 import { useCallback, useMemo, useState } from "react";
 import type { InitialMembersTypes } from "./types";
 import { apiClient } from "@/src/lib/apiClient";

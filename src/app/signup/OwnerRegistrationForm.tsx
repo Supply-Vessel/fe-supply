@@ -1,12 +1,62 @@
 "use client"
 
 import { EyeIcon, EyeOffIcon, CheckCircle, AlertCircle } from "lucide-react"
-import { UserType, OwnerFormData, OwnerSubmitData } from "./types"
-import React, { useCallback, useMemo, useState } from "react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import React, { useCallback, useState } from "react"
 import { Button } from "@/src/components/ui/button"
+import { UserType, OwnerSubmitData } from "./types"
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
+import { useForm } from "react-hook-form"
 import Link from "next/link"
+import { z } from "zod"
+
+// Zod схема валидации
+const ownerFormSchema = z.object({
+  organizationName: z
+    .string()
+    .min(1, "Organization name is required")
+    .regex(/^\S+$/, "Organization name must not contain spaces"),
+  firstName: z
+    .string()
+    .min(1, "First name is required")
+    .min(2, "First name must be at least 2 characters"),
+  lastName: z
+    .string()
+    .min(1, "Last name is required")
+    .min(2, "Last name must be at least 2 characters"),
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .email("Please enter a valid email address"),
+  address: z
+    .string()
+    .min(1, "Address is required"),
+  institution: z
+    .string()
+    .min(1, "Institution/Company is required"),
+  contactPhone: z
+    .string()
+    .min(1, "Contact phone is required")
+    .regex(/^[\d\s\+\-\(\)]+$/, "Please enter a valid phone number"),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number"),
+  confirmPassword: z
+    .string()
+    .min(1, "Please confirm your password"),
+  agreeToTerms: z
+    .boolean()
+    .refine(val => val === true, "You must agree to the terms and conditions"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+})
+
+type OwnerFormValues = z.infer<typeof ownerFormSchema>
 
 interface OwnerRegistrationFormProps {
   onSubmit: (data: OwnerSubmitData) => Promise<void>
@@ -21,22 +71,33 @@ export default function OwnerRegistrationForm({
   error, 
   success 
 }: OwnerRegistrationFormProps) {
-  const [formData, setFormData] = useState<OwnerFormData>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    address: "",
-    institution: "",
-    contactPhone: "",
-    password: "",
-    confirmPassword: "",
-    organizationName: "",
-    agreeToTerms: false,
-  })
-
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [passwordStrength, setPasswordStrength] = useState(0)
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isValid },
+  } = useForm<OwnerFormValues>({
+    resolver: zodResolver(ownerFormSchema),
+    mode: "onChange",
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      address: "",
+      institution: "",
+      contactPhone: "",
+      password: "",
+      confirmPassword: "",
+      organizationName: "",
+      agreeToTerms: false,
+    },
+  })
+
+  const password = watch("password")
+  const confirmPassword = watch("confirmPassword")
 
   const calculatePasswordStrength = useCallback((password: string) => {
     let strength = 0
@@ -48,17 +109,7 @@ export default function OwnerRegistrationForm({
     return strength
   }, [])
 
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }))
-
-    if (name === "password") {
-      setPasswordStrength(calculatePasswordStrength(value))
-    }
-  }, [calculatePasswordStrength])
+  const passwordStrength = calculatePasswordStrength(password || "")
 
   const getPasswordStrengthColor = useCallback((strength: number) => {
     if (strength <= 2) return "bg-red-500"
@@ -72,47 +123,29 @@ export default function OwnerRegistrationForm({
     return "Strong"
   }, [])
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-    const { agreeToTerms, confirmPassword, ...submitData } = formData
+  const onFormSubmit = async (data: OwnerFormValues) => {
+    const { agreeToTerms, confirmPassword, ...submitData } = data
     await onSubmit({
       ...submitData,
       userType: UserType.ORGANIZATION_OWNER,
     })
-  }, [formData, onSubmit])
-
-  const isFormValid = useMemo(() => {
-    return (
-      formData.firstName &&
-      formData.lastName &&
-      formData.email &&
-      formData.address &&
-      formData.institution &&
-      formData.contactPhone &&
-      formData.organizationName &&
-      formData.password &&
-      formData.confirmPassword &&
-      formData.password === formData.confirmPassword &&
-      formData.agreeToTerms &&
-      passwordStrength >= 3
-    )
-  }, [formData, passwordStrength])
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
       {/* Organization Name */}
       <div className="space-y-2">
         <Label htmlFor="owner-organizationName">Organization Name *</Label>
         <Input
           id="owner-organizationName"
-          name="organizationName"
           type="text"
-          required
-          placeholder="Maritime Shipping Co."
-          value={formData.organizationName}
-          onChange={handleInputChange}
-          className="border-blue-200 focus:border-blue-500"
+          placeholder="MaritimeShippingCo"
+          {...register("organizationName")}
+          className={`border-blue-200 focus:border-blue-500 ${errors.organizationName ? "border-red-500" : ""}`}
         />
+        {errors.organizationName && (
+          <p className="text-sm text-red-500">{errors.organizationName.message}</p>
+        )}
       </div>
 
       {/* Name Fields */}
@@ -121,25 +154,27 @@ export default function OwnerRegistrationForm({
           <Label htmlFor="owner-firstName">First Name *</Label>
           <Input
             id="owner-firstName"
-            name="firstName"
             type="text"
-            required
             placeholder="John"
-            value={formData.firstName}
-            onChange={handleInputChange}
+            {...register("firstName")}
+            className={errors.firstName ? "border-red-500" : ""}
           />
+          {errors.firstName && (
+            <p className="text-sm text-red-500">{errors.firstName.message}</p>
+          )}
         </div>
         <div className="space-y-2">
           <Label htmlFor="owner-lastName">Last Name *</Label>
           <Input
             id="owner-lastName"
-            name="lastName"
             type="text"
-            required
             placeholder="Doe"
-            value={formData.lastName}
-            onChange={handleInputChange}
+            {...register("lastName")}
+            className={errors.lastName ? "border-red-500" : ""}
           />
+          {errors.lastName && (
+            <p className="text-sm text-red-500">{errors.lastName.message}</p>
+          )}
         </div>
       </div>
 
@@ -149,26 +184,28 @@ export default function OwnerRegistrationForm({
           <Label htmlFor="owner-institution">Institution/Company *</Label>
           <Input
             id="owner-institution"
-            name="institution"
             type="text"
-            required
             placeholder="MyCompany Inc."
-            value={formData.institution}
-            onChange={handleInputChange}
+            {...register("institution")}
+            className={errors.institution ? "border-red-500" : ""}
           />
+          {errors.institution && (
+            <p className="text-sm text-red-500">{errors.institution.message}</p>
+          )}
         </div>
         {/* Address */}
         <div className="space-y-2">
           <Label htmlFor="owner-address">Address *</Label>
           <Input
             id="owner-address"
-            name="address"
             type="text"
-            required
             placeholder="123 Harbor Street"
-            value={formData.address}
-            onChange={handleInputChange}
+            {...register("address")}
+            className={errors.address ? "border-red-500" : ""}
           />
+          {errors.address && (
+            <p className="text-sm text-red-500">{errors.address.message}</p>
+          )}
         </div>
       </div>
 
@@ -178,42 +215,41 @@ export default function OwnerRegistrationForm({
           <Label htmlFor="owner-email">Email *</Label>
           <Input
             id="owner-email"
-            name="email"
             type="email"
-            required
             placeholder="contact@company.com"
-            value={formData.email}
-            onChange={handleInputChange}
+            {...register("email")}
+            className={errors.email ? "border-red-500" : ""}
           />
+          {errors.email && (
+            <p className="text-sm text-red-500">{errors.email.message}</p>
+          )}
         </div>
         <div className="space-y-2">
           <Label htmlFor="owner-contactPhone">Contact Phone *</Label>
           <Input
             id="owner-contactPhone"
-            name="contactPhone"
             type="tel"
-            required
             placeholder="+1 (555) 123-4567"
-            value={formData.contactPhone}
-            onChange={handleInputChange}
+            {...register("contactPhone")}
+            className={errors.contactPhone ? "border-red-500" : ""}
           />
+          {errors.contactPhone && (
+            <p className="text-sm text-red-500">{errors.contactPhone.message}</p>
+          )}
         </div>
       </div>
 
       {/* Password */}
       <div className="space-y-2">
-        <Label htmlFor="owner-password">Password</Label>
+        <Label htmlFor="owner-password">Password *</Label>
         <div className="relative">
           <Input
             id="owner-password"
-            name="password"
             type={showPassword ? "text" : "password"}
             autoComplete="new-password"
-            required
             placeholder="••••••••"
-            value={formData.password}
-            onChange={handleInputChange}
-            className="pr-10"
+            {...register("password")}
+            className={`pr-10 ${errors.password ? "border-red-500" : ""}`}
           />
           <button
             type="button"
@@ -227,9 +263,12 @@ export default function OwnerRegistrationForm({
             )}
           </button>
         </div>
+        {errors.password && (
+          <p className="text-sm text-red-500">{errors.password.message}</p>
+        )}
 
         {/* Password Strength Indicator */}
-        {formData.password && (
+        {password && (
           <div className="mt-2">
             <div className="flex items-center justify-between text-xs mb-1">
               <span className="text-gray-600">Password strength:</span>
@@ -257,18 +296,15 @@ export default function OwnerRegistrationForm({
 
       {/* Confirm Password */}
       <div className="space-y-2">
-        <Label htmlFor="owner-confirmPassword">Confirm Password</Label>
+        <Label htmlFor="owner-confirmPassword">Confirm Password *</Label>
         <div className="relative">
           <Input
             id="owner-confirmPassword"
-            name="confirmPassword"
             type={showConfirmPassword ? "text" : "password"}
             autoComplete="new-password"
-            required
             placeholder="••••••••"
-            value={formData.confirmPassword}
-            onChange={handleInputChange}
-            className="pr-10"
+            {...register("confirmPassword")}
+            className={`pr-10 ${errors.confirmPassword ? "border-red-500" : ""}`}
           />
           <button
             type="button"
@@ -282,11 +318,14 @@ export default function OwnerRegistrationForm({
             )}
           </button>
         </div>
+        {errors.confirmPassword && (
+          <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>
+        )}
 
         {/* Password Match Indicator */}
-        {formData.confirmPassword && (
+        {confirmPassword && !errors.confirmPassword && (
           <div className="mt-1 flex items-center text-xs">
-            {formData.password === formData.confirmPassword ? (
+            {password === confirmPassword ? (
               <>
                 <CheckCircle className="h-3 w-3 text-green-500 mr-1" />
                 <span className="text-green-500">Passwords match</span>
@@ -302,26 +341,28 @@ export default function OwnerRegistrationForm({
       </div>
       
       {/* Terms */}
-      <div className="flex items-start">
-        <input
-          type="checkbox"
-          id="owner-agreeToTerms"
-          name="agreeToTerms"
-          checked={formData.agreeToTerms}
-          onChange={handleInputChange}
-          className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-          required
-        />
-        <label htmlFor="owner-agreeToTerms" className="ml-2 text-sm text-gray-700">
-          I agree to the{" "}
-          <Link href="/terms" className="text-blue-600 hover:text-blue-500 font-medium">
-            Terms of Service
-          </Link>{" "}
-          and{" "}
-          <Link href="/privacy" className="text-blue-600 hover:text-blue-500 font-medium">
-            Privacy Policy
-          </Link>
-        </label>
+      <div className="space-y-1">
+        <div className="flex items-start">
+          <input
+            type="checkbox"
+            id="owner-agreeToTerms"
+            {...register("agreeToTerms")}
+            className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+          />
+          <label htmlFor="owner-agreeToTerms" className="ml-2 text-sm text-gray-700">
+            I agree to the{" "}
+            <Link href="/terms" className="text-blue-600 hover:text-blue-500 font-medium">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy" className="text-blue-600 hover:text-blue-500 font-medium">
+              Privacy Policy
+            </Link>
+          </label>
+        </div>
+        {errors.agreeToTerms && (
+          <p className="text-sm text-red-500 ml-6">{errors.agreeToTerms.message}</p>
+        )}
       </div>
 
       {/* Error/Success messages */}
@@ -345,11 +386,10 @@ export default function OwnerRegistrationForm({
       <Button 
         type="submit" 
         className="w-full bg-blue-600 hover:bg-blue-700" 
-        disabled={!isFormValid || isLoading}
+        disabled={!isValid || isLoading}
       >
         {isLoading ? "Creating account..." : "Create Organization Account"}
       </Button>
     </form>
   )
 }
-

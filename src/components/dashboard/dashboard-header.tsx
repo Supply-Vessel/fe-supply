@@ -1,13 +1,10 @@
 "use client"
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/src/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback } from "@/src/components/ui/avatar"
-import type { VesselMembersTypes } from "@/src/app/[vesselId]/team/types"
-import { Button } from "@/src/components/ui/button"
-import { Input } from "@/src/components/ui/input"
-import { Badge } from "@/src/components/ui/badge"
-import { Bell, Search } from "lucide-react"
+import type { VesselMembersTypes } from "@/src/app/[organizationName]/[vesselId]/team/types"
 import { getUserInitials } from "@/src/lib/getUserInitials"
+import { Avatar } from "@/src/components/ui/avatar"
+import { Button } from "@/src/components/ui/button"
 
 export function DashboardHeader({vesselMembers}: {vesselMembers: VesselMembersTypes[]}) {
   return (
@@ -25,7 +22,7 @@ export function DashboardHeader({vesselMembers}: {vesselMembers: VesselMembersTy
         </form> */}
       </div>
       <div className="flex items-center gap-4">
-        <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
+        <div className="*:data-[slot=avatar]:ring-background flex *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale gap-0.5">
           {vesselMembers.map((member) => {
             return (
               <DropdownMenu key={member.id}>

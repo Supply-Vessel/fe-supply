@@ -1,5 +1,5 @@
+import type { Request } from "@/src/app/[organizationName]/[vesselId]/dashboard/types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
-import type { Request } from "@/src/app/[vesselId]/dashboard/types"
 import { MousePointer } from "lucide-react"
 import { useMemo } from "react"
 

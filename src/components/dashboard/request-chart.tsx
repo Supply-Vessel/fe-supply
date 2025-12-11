@@ -1,6 +1,6 @@
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import type { Request } from "@/src/app/[organizationName]/[vesselId]/dashboard/types"
 import { ChartContainer, ChartTooltipContent } from "@/src/components/ui/chart"
-import type { Request } from "@/src/app/[vesselId]/dashboard/types"
 import { useMemo } from "react"
 
 // Fallback colors if requestType doesn't have a color
