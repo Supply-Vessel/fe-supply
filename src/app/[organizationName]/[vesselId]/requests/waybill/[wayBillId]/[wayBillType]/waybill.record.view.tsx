@@ -15,13 +15,14 @@ import Link from "next/link"
 
 export interface WaybillRecordViewProps {
     wayBillType: WayBillType;
+    organizationName: string;
     wayBillId: string;
     vesselId: string;
     userId: string;
     logistics: any;
 }
 
-export default function WaybillRecordView({userId, wayBillId, wayBillType, logistics, vesselId}: WaybillRecordViewProps) {
+export default function WaybillRecordView({userId, wayBillId, wayBillType, logistics, vesselId, organizationName}: WaybillRecordViewProps) {
   const router = useRouter();
   const trackingData = logistics?.data;
   const airline = logistics?.metadata?.airline;
@@ -34,7 +35,7 @@ export default function WaybillRecordView({userId, wayBillId, wayBillType, logis
   return (
     <div className="container mx-auto p-4 md:p-6">
       <div className="mb-4">
-        <Link href={`/${vesselId}/requests`}>
+        <Link href={`/${organizationName}/${vesselId}/requests`}>
           <Button
               variant="ghost"
               size="sm"
