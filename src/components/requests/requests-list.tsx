@@ -82,7 +82,7 @@ export function RequestsList({requests, requestPagination, setPagination, handle
   const isMobile = useMediaQuery("(max-width: 768px)")
   const router = useRouter();
   const params = useParams();
-  const {vesselId } = params;
+  const {vesselId, organizationName} = params;
 
   useEffect(() => {
     if (isMobile) {
@@ -374,7 +374,7 @@ export function RequestsList({requests, requestPagination, setPagination, handle
             }
             onClick={() => {
               if (request.wayBillType !== WayBillType.NO_WAYBILL) {
-                router.push(`/${vesselId}/requests/waybill/${currentValue}/${request.wayBillType}`)
+                router.push(`/${organizationName}/${vesselId}/requests/waybill/${currentValue}/${request.wayBillType}`)
               }
           }}>
             {request.wayBillType !== WayBillType.NO_WAYBILL && (
@@ -1091,7 +1091,7 @@ export function RequestsList({requests, requestPagination, setPagination, handle
                             }
                             onClick={() => {
                               if (request.wayBillType !== WayBillType.NO_WAYBILL) {
-                                router.push(`/${vesselId}/requests/waybill/${request.wayBillNumber}/${request.wayBillType}`)
+                                router.push(`/${organizationName}/${vesselId}/requests/waybill/${request.wayBillNumber}/${request.wayBillType}`)
                               }
                           }}>
                             {request.wayBillType !== WayBillType.NO_WAYBILL && (
