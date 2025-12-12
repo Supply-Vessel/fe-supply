@@ -17,7 +17,7 @@ export default async function sendVarificationCode(email: string, code: string) 
                 <p style="font-size: 28px; font-weight: bold; text-align: center; color: #4a90e2;">
                     ${code}
                 </p>
-                <p style="text-align: center; font-size: 14px; color: #888;">This code will expire in 24 hours.</p>
+                <p style="text-align: center; font-size: 14px; color: #888;">This code will expire in 10 days.</p>
             </div>
         `,
     });

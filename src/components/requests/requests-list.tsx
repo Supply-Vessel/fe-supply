@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
 import { LayoutGrid, LayoutList, Check, X, Plus, Link2, Plane, Package } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/popover"
+import type { OrgRole, UserType } from "@prisma/client"
 import { Checkbox } from "@/src/components/ui/checkbox"
 import { useParams, useRouter } from "next/navigation"
 import { useState, useMemo, useEffect } from "react"
@@ -27,6 +28,7 @@ interface RequestsListProps {
   requestPagination: RequestPagination;
   defaultType?: RequestTypeModel;
   requestEnums: RequestEnums;
+  canInviteMembers: boolean;
   defaultTypeId?: string;
   requests: Request[];
 }
@@ -55,7 +57,9 @@ interface ColumnVisibility {
   storeLocation: boolean;
 }
 
-export function RequestsList({requests, requestPagination, setPagination, handleUpdateDataPagination, onSave, onAdd, defaultType, defaultTypeId, requestEnums, setSelectedRequest, setOpenEditRequestDialog, setOpenAddRequestDialog}: RequestsListProps) {
+export function RequestsList(props: RequestsListProps) {
+  const { setPagination, handleUpdateDataPagination, onSave, onAdd, setSelectedRequest, setOpenEditRequestDialog, setOpenAddRequestDialog } = props;
+  const { requests, requestPagination, defaultType, defaultTypeId, requestEnums, canInviteMembers } = props;
   const [selectedRequests, setSelectedRequests] = useState<string[]>([])
   const [view, setView] = useState<"table" | "grid">("table")
   const [editingRows, setEditingRows] = useState<EditState>({})
@@ -140,6 +144,10 @@ export function RequestsList({requests, requestPagination, setPagination, handle
   }
 
   const handleEdit = (requestId: string, request: Request) => {
+    if (!canInviteMembers) {
+      toast.error("You are not authorized to edit requests")
+      return
+    }
     setEditingRows(prev => ({ ...prev, [requestId]: true }))
     setEditData(prev => ({ ...prev, [requestId]: { ...request } }))
   }
@@ -622,7 +630,13 @@ export function RequestsList({requests, requestPagination, setPagination, handle
           <Button
             variant="outline"
             size="sm"
-            onClick={view === "table" ? handleAddNew : () => {setOpenAddRequestDialog(true)}}
+            onClick={() => {
+              if (!canInviteMembers) {
+                toast.error("You are not authorized to add requests")
+                return
+              }
+              view === "table" ? handleAddNew() : setOpenAddRequestDialog(true)
+            }}
             disabled={isAddingNew}
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -1109,6 +1123,10 @@ export function RequestsList({requests, requestPagination, setPagination, handle
                 <div className="border-t border-gray-100 p-3">
                   <Button
                     onClick={() => {
+                      if (!canInviteMembers) {
+                        toast.error("You are not authorized to edit requests")
+                        return
+                      }
                       setSelectedRequest(request),
                       setOpenEditRequestDialog(true)
                     }}

@@ -10,13 +10,6 @@ import type {
 } from "@/src/components/requests/types";
 import { ActivityLevel, RecordType } from "@prisma/client";
 
-export interface PageProps {
-  params: {
-    vesselId: string;
-    userId: string;
-  };
-}
-
 export interface RequestsPageData {
   requestPagination: RequestPagination;
   requestTypes: RequestTypeModel[];

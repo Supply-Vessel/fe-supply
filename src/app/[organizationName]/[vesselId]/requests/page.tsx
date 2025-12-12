@@ -2,11 +2,18 @@
 
 import RequestsContainer from "./request.container";
 import { apiClient } from "@/src/lib/apiClient";
-import type { PageProps } from "./types";
 import { cookies } from "next/headers";
 
+interface PageProps {
+  params: {
+    organizationName: string;
+    vesselId: string;
+    userId: string;
+  };
+}
+
 export default async function RequestsPage({params}: PageProps) {
-  const {vesselId} = await params;
+  const { vesselId, organizationName} = await params;
   const cookieStore = await cookies();
   const userId = await cookieStore.get('USER_ID')?.value || 'default';
 
@@ -19,10 +26,16 @@ export default async function RequestsPage({params}: PageProps) {
     `${process.env.NEXT_PUBLIC_ABSOLUTE_URL}/api/requests/enums`
   );
 
+  const user = await apiClient.get(`${process.env.NEXT_PUBLIC_ABSOLUTE_URL}/api/users/${organizationName}/${vesselId}/${userId}`);
+  const userType = user.data?.userType;
+  const userOrgRole = user.data?.orgRole;
+
   return (
     <RequestsContainer
       requestTypes={requestTypesResponse.data || []}
       requestEnums={requestEnums.data}
+      userOrgRole={userOrgRole}
+      userType={userType}
       vesselId={vesselId}
       userId={userId}
     />

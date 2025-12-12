@@ -49,11 +49,8 @@ export default function WaybillRecordView({userId, wayBillId, wayBillType, logis
       <div className="grid gap-6">
         {/* Waybill Header */}
         <div className="flex flex-col md:flex-row gap-6 items-start">
-          <Avatar className="h-24 w-24 rounded-md border">
-            <AvatarImage src={"/placeholder.svg"} alt={companyName} />
-            <AvatarFallback className="rounded-md bg-blue-100 text-blue-600 text-xl">
-              {companyCode || "WB"}
-            </AvatarFallback>
+          <Avatar className="h-24 w-24 rounded-md border bg-blue-600 text-white text-2xl flex items-center justify-center font-semibold">
+              {companyCode ? companyCode.toUpperCase() : "WB"}
           </Avatar>
 
           <div className="flex-1 space-y-2">

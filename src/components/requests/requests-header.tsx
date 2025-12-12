@@ -14,9 +14,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/src/components/ui/dialog"
+import { toast } from "sonner"
 
 interface RequestsHeaderProps {
   onCreateType?: (data: { name: string; displayName: string; description?: string; color?: string }) => Promise<void>
+  canInviteMembers: boolean
   isLoading?: boolean
 }
 
@@ -31,7 +33,7 @@ const COLORS = [
   { name: "Pink", value: "#EC4899" },
 ]
 
-export function RequestsHeader({ onCreateType, isLoading }: RequestsHeaderProps) {
+export function RequestsHeader({ onCreateType, isLoading, canInviteMembers }: RequestsHeaderProps) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState("")
   const [displayName, setDisplayName] = useState("")
@@ -71,12 +73,21 @@ export function RequestsHeader({ onCreateType, isLoading }: RequestsHeaderProps)
       {onCreateType && (
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button variant="outline" size="sm" disabled={isLoading}>
+            <Button
+              onClick={() => {
+                if (!canInviteMembers) {
+                  toast.error("You are not authorized to add request types")
+                  return
+                }
+              }}
+              variant="outline"
+              size="sm"
+              disabled={isLoading}>
               <Plus className="h-4 w-4 mr-2" />
               Add Request Type
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          {canInviteMembers && <DialogContent className="sm:max-w-[425px]">
             <form onSubmit={handleSubmit}>
               <DialogHeader>
                 <DialogTitle>Create Request Type</DialogTitle>
@@ -144,7 +155,7 @@ export function RequestsHeader({ onCreateType, isLoading }: RequestsHeaderProps)
                 </Button>
               </DialogFooter>
             </form>
-          </DialogContent>
+          </DialogContent>}
         </Dialog>
       )}
     </div>

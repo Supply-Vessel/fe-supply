@@ -3,13 +3,16 @@
 import { Request, RequestPagination, RequestEnums, RequestTypeModel } from "@/src/components/requests/types";
 import { RequestsHeader } from "@/src/components/requests/requests-header";
 import { RequestsTabs } from "@/src/components/requests/requests-tabs";
+import { OrgRole, UserType } from "@prisma/client"; 
 import { apiClient } from "@/src/lib/apiClient";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 interface RequestPropsType {
     requestTypes: RequestTypeModel[];
     requestEnums: RequestEnums;
+    userOrgRole: OrgRole;
+    userType: UserType;
     vesselId: string;
     userId: string;
 }
@@ -24,7 +27,7 @@ const defaultPagination: RequestPagination = {
 };
 
 const RequestsContainer = (props: RequestPropsType) => {
-    const { requestTypes: initialRequestTypes, requestEnums, userId, vesselId } = props;
+    const { requestTypes: initialRequestTypes, requestEnums, userId, vesselId, userType, userOrgRole } = props;
     
     // Store request types
     const [requestTypes, setRequestTypes] = useState<RequestTypeModel[]>(initialRequestTypes);
@@ -33,6 +36,12 @@ const RequestsContainer = (props: RequestPropsType) => {
     const [requestsData, setRequestsData] = useState<Record<string, Request[]>>({});
     const [paginationData, setPaginationData] = useState<Record<string, RequestPagination>>({});
     const [isLoading, setIsLoading] = useState(false);
+
+    const canInviteMembers = useMemo(() => {
+        if (userType === 'ORGANIZATION_OWNER') return true;
+        
+        return userOrgRole === 'ADMIN' || userOrgRole === 'MANAGER';
+      }, [userType, userOrgRole]);
 
     // Fetch requests for a specific type
     const handleFetchRequests = useCallback(async (
@@ -162,6 +171,7 @@ const RequestsContainer = (props: RequestPropsType) => {
         <div className="space-y-6">
             <RequestsHeader 
                 onCreateType={handleCreateRequestType}
+                canInviteMembers={canInviteMembers}
                 isLoading={isLoading}
             />
             <RequestsTabs
@@ -169,6 +179,7 @@ const RequestsContainer = (props: RequestPropsType) => {
                 handleFetchRequests={handleFetchRequests}
                 handleSaveRequest={handleSaveRequest}
                 handleAddRequest={handleAddRequest}
+                canInviteMembers={canInviteMembers}
                 paginationData={paginationData}
                 requestTypes={requestTypes}
                 requestsData={requestsData}

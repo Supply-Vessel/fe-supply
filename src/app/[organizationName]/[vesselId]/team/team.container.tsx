@@ -10,17 +10,16 @@ import TeamView from "./team.view";
 import { toast } from "sonner";
 
 interface TeamContainerProps{
-    organizationMembers: Organization[],
     initialMembers: InitialMembersTypes[],
     requestEnums: RequestEnums,
+    userOrgRole: OrgRole,
     userType: UserType,
     vesselId: string,
     userId: string,
 }
 
 export default function TeamContainer(props: TeamContainerProps) {
-    const {initialMembers, requestEnums, userId,vesselId, userType, organizationMembers} = props;
-    const [organizations, setOrganizations] = useState<Organization[]>(organizationMembers || [])
+    const {initialMembers, requestEnums, userId,vesselId, userType, userOrgRole } = props;
     const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -50,10 +49,8 @@ export default function TeamContainer(props: TeamContainerProps) {
   const canInviteMembers = useMemo(() => {
     if (userType === 'ORGANIZATION_OWNER') return true;
     
-    return organizations.some(org => 
-      org.memberRole === 'ADMIN' || org.memberRole === 'MANAGER'
-  );
-}, [userType, organizations]);
+    return userOrgRole === 'ADMIN' || userOrgRole === 'MANAGER';
+  }, [userType, userOrgRole]);
 
   // Handle add member
   const handleAddMember = useCallback(async () => {

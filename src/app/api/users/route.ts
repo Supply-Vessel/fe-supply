@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
                 data: {
                     email: result.user.email,
                     code,
-                    expiresAt: new Date(Date.now() + 10 + 24 * 60 * 60 * 1000),
+                    expiresAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
                 },
             });
 
@@ -246,7 +246,7 @@ export async function POST(req: NextRequest) {
             data: {
                 email: user.email,
                 code,
-                expiresAt: new Date(Date.now() + 10 + 24 * 60 * 60 * 1000),
+                expiresAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
             },
         });
 

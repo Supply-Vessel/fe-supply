@@ -1,21 +1,22 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import type { Request, RequestEnums, RequestPagination, RequestTypeModel } from "@/src/components/requests/types"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { RequestsList } from "@/src/components/requests/requests-list"
 import { EditAnimalDialog } from "./edit-request-dialog"
 import { AddAnimalDialog } from "./add-request-dialog"
+import { useEffect, useState } from "react"
 
 interface RequestsTabsProps {
-  requestTypes: RequestTypeModel[];
-  requestsData: Record<string, Request[]>;
-  paginationData: Record<string, RequestPagination>;
   handleUpdateDataPagination: (data: { page?: number; pageSize?: number; requestTypeId: string }) => Promise<void>;
   handleFetchRequests: (typeId: string, page?: number, pageSize?: number) => Promise<void>;
   handleSaveRequest: (request: Partial<Request>) => Promise<void>;
   handleAddRequest: (request: Partial<Request>) => Promise<void>;
+  paginationData: Record<string, RequestPagination>;
+  requestsData: Record<string, Request[]>;
+  requestTypes: RequestTypeModel[];
   requestEnums: RequestEnums;
+  canInviteMembers: boolean;
   vesselId: string;
   userId: string;
 }
@@ -35,6 +36,7 @@ export function RequestsTabs(props: RequestsTabsProps) {
     handleFetchRequests,
     handleSaveRequest,
     handleAddRequest,
+    canInviteMembers,
     paginationData,
     requestTypes,
     requestsData,
@@ -110,6 +112,7 @@ export function RequestsTabs(props: RequestsTabsProps) {
             setOpenAddRequestDialog={setOpenAddRequestDialog}
             setSelectedRequest={setSelectedRequest}
             requests={requestsData[type.id] || []}
+            canInviteMembers={canInviteMembers}
             setPagination={() => {}}
             requestEnums={requestEnums}
             onSave={handleSaveRequest}

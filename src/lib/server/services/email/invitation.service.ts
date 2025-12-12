@@ -45,7 +45,7 @@ export default async function sendInvitationCode(email: string, code: string,ves
                 </div>
 
                 <p style="text-align: center; font-size: 14px; color: #888; margin-top: 20px;">
-                    This invitation code will expire in 24 hours.
+                    This invitation code will expire in 10 days.
                 </p>
                 
                 <p style="text-align: center; font-size: 12px; color: #a0aec0; margin-top: 20px;">
