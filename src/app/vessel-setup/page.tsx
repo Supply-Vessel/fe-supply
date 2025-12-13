@@ -370,7 +370,7 @@ const VesselSetupPage = () => {
 
                         <TabsContent value="join">
                             <CardHeader>
-                                <CardTitle>Join Existing Vessel</CardTitle>
+                                <CardTitle>Join Existing Vessel / Organization</CardTitle>
                                 <CardDescription>
                                     Enter the 6-digit invitation code provided by your vessel administrator to join an existing vessel.
                                 </CardDescription>
