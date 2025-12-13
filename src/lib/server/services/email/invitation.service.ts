@@ -3,8 +3,7 @@ import { Resend } from 'resend';
 const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
 export default async function sendInvitationCode(email: string, code: string,vesselId: string, role: string) {
-    const signupUrl = '${process.env.NEXT_PUBLIC_ABSOLUTE_URL}/signup';
-    const joinLabUrl = '${process.env.NEXT_PUBLIC_ABSOLUTE_URL}/laboratory-setup?tab=join';
+    const signupUrl = `${process.env.NEXT_PUBLIC_ABSOLUTE_URL}/signup`;
 
     await resend.emails.send({
         from: 'onboarding@resend.dev',
@@ -35,13 +34,7 @@ export default async function sendInvitationCode(email: string, code: string,ves
                             Register New Account
                         </a>
                     </div>
-                    
-                    <div style="margin-bottom: 15px;">
-                        <a href="${joinLabUrl}" 
-                           style="background-color: #38a169; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
-                            Join Vessel
-                        </a>
-                    </div>
+
                 </div>
 
                 <p style="text-align: center; font-size: 14px; color: #888; margin-top: 20px;">
