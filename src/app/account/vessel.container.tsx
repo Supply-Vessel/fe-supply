@@ -90,7 +90,7 @@ export default function VesselsContainer({ accountData }: VesselsContainerProps)
         ),
         [vessels, searchTerm]
     );
-console.log(filteredVessels)
+
     const formatDate = useCallback((date: Date | string) => {
         const dateObj = typeof date === 'string' ? new Date(date) : date;
         
@@ -119,7 +119,7 @@ console.log(filteredVessels)
             const user = await AuthService.getCurrentUser();
             
             const inviteData = {
-                email: inviteForm.email,
+                email: formData.email,
                 organizationId: formData.organizationId,
                 orgRole: formData.orgRole,
                 invitedBy: user.userId,

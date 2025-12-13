@@ -207,7 +207,7 @@ const VesselSetupPage = () => {
                             </TabsTrigger>
                             <TabsTrigger value="join" className="flex items-center gap-2">
                                 <Users className="h-4 w-4" />
-                                Join Vessel
+                                Join Org / Vessel
                             </TabsTrigger>
                         </TabsList>
 

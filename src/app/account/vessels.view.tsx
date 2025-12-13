@@ -143,7 +143,7 @@ export default function VesselsView(
                             {canCreateVessel && (
                                 <Button onClick={handleCreateVessel} className="bg-blue-600 hover:bg-blue-700 flex items-center">
                                     <Plus className="h-4 w-4" />
-                                    {isMobile ? "Create" : "Create / Join New Vessel"}
+                                    {"Create or Join"}
                                 </Button>
                             )}
                             <Button onClick={handleLogout} className="bg-red-600 hover:bg-red-700 flex items-center">
@@ -269,7 +269,7 @@ export default function VesselsView(
                         <div className="mt-6 flex justify-center space-x-3">
                             <Button onClick={handleCreateVessel} className="bg-blue-600 hover:bg-blue-700">
                                 <Plus className="h-4 w-4 mr-2" />
-                                Create / Join New Vessel
+                                Create or Join
                             </Button>
                         </div>
                     )}
